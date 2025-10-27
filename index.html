@@ -9,108 +9,67 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #1a2332; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .navbar { background: #0f1419; border-bottom: 2px solid #ff8c00; padding: 1rem 2rem; display: flex; align-items: center; gap: 2rem; overflow-x: auto; }
-        .logo { font-size: 1.8rem; font-weight: bold; color: #ff8c00; white-space: nowrap; }
-        .nav-tabs { display: flex; gap: 0.5rem; flex-wrap: nowrap; overflow-x: auto; }
-        .nav-tab { padding: 0.6rem 1.2rem; background: #2a3f5f; border: none; color: #fff; cursor: pointer; border-radius: 4px; transition: all 0.3s; white-space: nowrap; font-size: 0.9rem; }
-        .nav-tab.active { background: #ff8c00; color: #000; font-weight: bold; }
-        .nav-tab:hover { background: #ff8c00; color: #000; }
-        .container { padding: 2rem; max-width: 1600px; margin: 0 auto; }
+        body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .navbar { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 3px solid #f97316; padding: 1rem; display: flex; align-items: center; gap: 2rem; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #f97316; }
+        .nav-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .nav-btn { padding: 0.5rem 1rem; border: none; background: #334155; color: #e2e8f0; cursor: pointer; border-radius: 0.5rem; transition: all 0.3s; }
+        .nav-btn.active { background: #f97316; color: #000; font-weight: bold; }
+        .nav-btn:hover { background: #475569; }
+        .container { padding: 2rem; max-width: 1400px; margin: 0 auto; }
         .section { display: none; }
         .section.active { display: block; }
-        .section-title { font-size: 2rem; color: #ff8c00; margin-bottom: 2rem; font-weight: bold; }
-        .sub-tabs { display: flex; gap: 1rem; border-bottom: 2px solid #2a3f5f; margin-bottom: 2rem; }
-        .sub-tab { padding: 0.8rem 1.5rem; background: none; border: none; color: #999; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s; }
-        .sub-tab.active { color: #ff8c00; border-bottom-color: #ff8c00; }
-        .sub-section { display: none; }
-        .sub-section.active { display: block; }
-        .btn-primary { padding: 0.8rem 1.5rem; background: #ff8c00; border: none; color: #000; font-weight: bold; border-radius: 4px; cursor: pointer; transition: all 0.3s; }
-        .btn-primary:hover { background: #ffb84d; }
-        .btn-secondary { padding: 0.8rem 1.5rem; background: #3a4f6f; border: none; color: #fff; border-radius: 4px; cursor: pointer; }
-        .btn-danger { padding: 0.4rem 0.8rem; background: #ff4444; border: none; color: #fff; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
-        .btn-success { padding: 0.4rem 0.8rem; background: #4ade80; border: none; color: #000; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .input-field { width: 100%; padding: 0.8rem; background: #2a3f5f; border: 1px solid #3a4f6f; color: #fff; border-radius: 4px; margin-bottom: 1rem; }
-        .input-field::placeholder { color: #666; }
-        .grid-products { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1.5rem; }
-        .product-card { background: #2a3f5f; padding: 1.5rem; border-radius: 8px; cursor: pointer; transition: all 0.3s; text-align: center; }
-        .product-card:hover { transform: translateY(-5px); background: #3a4f6f; }
-        .product-image { width: 100%; height: 120px; background: #1a2f4f; border-radius: 4px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; color: #666; font-size: 3rem; }
-        .product-name { font-weight: bold; margin-bottom: 0.5rem; }
-        .product-price { color: #ff8c00; font-size: 1.2rem; font-weight: bold; }
-        .product-profit { color: #888; font-size: 0.85rem; }
-        .cart-section { background: #2a3f5f; padding: 1.5rem; border-radius: 8px; }
-        .cart-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 1.5rem; }
-        .button-group { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-        .btn-toggle { padding: 0.6rem 1rem; background: #3a4f6f; border: none; color: #fff; cursor: pointer; border-radius: 4px; transition: all 0.3s; }
-        .btn-toggle.active { background: #ff8c00; color: #000; font-weight: bold; }
-        .cart-item { background: #1a2f4f; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; }
-        .cart-item-name { font-weight: bold; }
-        .cart-item-price { color: #ff8c00; font-weight: bold; margin-top: 0.5rem; }
-        .cart-item-extras { color: #ffb84d; font-size: 0.9rem; margin-top: 0.3rem; }
-        .cart-total { font-size: 1.5rem; font-weight: bold; color: #4ade80; margin: 1.5rem 0; }
-        .btn-finish { width: 100%; padding: 1rem; background: #4ade80; border: none; color: #000; font-weight: bold; font-size: 1.1rem; border-radius: 4px; cursor: pointer; transition: all 0.3s; }
-        .btn-finish:hover { background: #22c55e; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+        .card { background: #1e293b; border: 2px solid #334155; border-radius: 0.75rem; padding: 1.5rem; }
+        .card.active { border-color: #f97316; }
+        .product-card { cursor: pointer; transition: all 0.3s; border: 2px solid #334155; }
+        .product-card:hover { border-color: #f97316; transform: translateY(-5px); }
+        .product-card.pending { border-left: 5px solid #f97316; }
+        .product-card.ready { border-left: 5px solid #22c55e; }
+        .product-card.delayed { border-left: 5px solid #ef4444; }
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .btn-primary { background: #f97316; color: #000; }
+        .btn-primary:hover { background: #ea580c; }
+        .btn-success { background: #22c55e; color: #000; }
+        .btn-success:hover { background: #16a34a; }
+        .btn-danger { background: #ef4444; color: #fff; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-secondary { background: #475569; color: #e2e8f0; }
+        .btn-secondary:hover { background: #64748b; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
-        .modal-content { background: #2a3f5f; padding: 2rem; border-radius: 8px; max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative; }
-        .modal-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 1.5rem; }
-        .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
-        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+        .modal-content { background: #1e293b; border: 2px solid #f97316; border-radius: 0.75rem; padding: 2rem; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { font-size: 1.5rem; font-weight: bold; color: #f97316; margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; color: #cbd5e1; font-weight: bold; }
+        .form-input, .form-textarea { width: 100%; padding: 0.75rem; background: #0f172a; border: 2px solid #334155; border-radius: 0.5rem; color: #e2e8f0; font-family: inherit; }
+        .form-input:focus, .form-textarea:focus { outline: none; border-color: #f97316; }
+        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
         .checkbox-item { display: flex; align-items: center; gap: 0.5rem; }
         .checkbox-item input { cursor: pointer; }
-        .checkbox-item label { cursor: pointer; flex: 1; }
-        .checkbox-price { color: #4ade80; font-weight: bold; }
-        .textarea-field { width: 100%; padding: 0.8rem; background: #1a2f4f; border: 1px solid #3a4f6f; color: #fff; border-radius: 4px; margin-bottom: 1rem; min-height: 100px; font-family: inherit; }
-        .modal-buttons { display: flex; gap: 1rem; }
-        .btn-cancel { flex: 1; padding: 0.8rem; background: #3a4f6f; border: none; color: #fff; border-radius: 4px; cursor: pointer; }
-        .btn-save { flex: 1; padding: 0.8rem; background: #ff8c00; border: none; color: #000; font-weight: bold; border-radius: 4px; cursor: pointer; }
-        .payment-modal { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .payment-btn { padding: 1.5rem; background: #3a4f6f; border: none; color: #fff; border-radius: 4px; cursor: pointer; font-size: 1rem; transition: all 0.3s; }
-        .payment-btn:hover { background: #ff8c00; color: #000; }
-        .success-modal { text-align: center; }
-        .success-icon { font-size: 4rem; margin-bottom: 1rem; }
-        .kitchen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; }
-        .order-card { background: #2a3f5f; padding: 1.5rem; border-radius: 8px; border-left: 5px solid #ff8c00; }
-        .order-card.expired { border-left-color: #ff4444; background: #3a2f2f; }
-        .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-        .order-number { font-size: 1.5rem; font-weight: bold; color: #ff8c00; }
-        .order-type { background: #4ade80; color: #000; padding: 0.3rem 0.8rem; border-radius: 4px; font-size: 0.85rem; font-weight: bold; }
-        .order-type.delivery { background: #60a5fa; }
-        .order-client { color: #ffb84d; font-weight: bold; margin-bottom: 0.5rem; }
-        .order-timer { color: #888; font-size: 0.9rem; }
-        .order-items { background: #1a2f4f; padding: 1rem; border-radius: 4px; margin: 1rem 0; }
-        .order-item { margin-bottom: 0.5rem; }
-        .order-item-name { font-weight: bold; }
-        .order-item-extra { color: #ffb84d; font-size: 0.9rem; margin-left: 1rem; }
-        .order-buttons { display: flex; gap: 0.5rem; }
-        .btn-ready { flex: 1; padding: 0.8rem; background: #4ade80; border: none; color: #000; font-weight: bold; border-radius: 4px; cursor: pointer; }
-        .btn-cancel-order { flex: 1; padding: 0.8rem; background: #3a4f6f; border: none; color: #fff; border-radius: 4px; cursor: pointer; }
-        .table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        .table th { background: #2a3f5f; padding: 1rem; text-align: left; border-bottom: 2px solid #3a4f6f; }
-        .table td { padding: 1rem; border-bottom: 1px solid #2a3f5f; }
-        .table tr:hover { background: #2a3f5f; }
-        .badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
-        .badge-success { background: #4ade80; color: #000; }
-        .badge-warning { background: #fbbf24; color: #000; }
-        .badge-danger { background: #ff4444; color: #fff; }
-        .badge-info { background: #60a5fa; color: #fff; }
-        .badge-category { background: #a855f7; color: #fff; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-        .stat-card { background: #2a3f5f; padding: 1.5rem; border-radius: 8px; text-align: center; }
-        .stat-label { color: #888; font-size: 0.9rem; margin-bottom: 0.5rem; }
-        .stat-value { font-size: 2rem; font-weight: bold; }
-        .stat-value.success { color: #4ade80; }
-        .stat-value.warning { color: #fbbf24; }
-        .stat-value.danger { color: #ff4444; }
-        .stat-value.info { color: #60a5fa; }
-        .action-buttons { display: flex; gap: 0.5rem; }
-        .btn-edit { background: #60a5fa; border: none; color: #fff; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; }
-        .btn-delete { background: #ff4444; border: none; color: #fff; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; }
-        .input-number { width: 80px; padding: 0.4rem; background: #1a2f4f; border: 1px solid #3a4f6f; color: #fff; border-radius: 4px; }
-        .layout-main { display: grid; grid-template-columns: 1fr 380px; gap: 2rem; }
-        @media (max-width: 1200px) { .layout-main { grid-template-columns: 1fr; } }
-        .date-info { color: #888; margin-bottom: 1.5rem; }
+        .checkbox-item label { cursor: pointer; }
+        .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: bold; }
+        .badge-orange { background: #f97316; color: #000; }
+        .badge-green { background: #22c55e; color: #000; }
+        .badge-red { background: #ef4444; color: #fff; }
+        .badge-blue { background: #3b82f6; color: #fff; }
+        .timer { font-size: 1.25rem; font-weight: bold; color: #f97316; }
+        .timer.warning { color: #eab308; }
+        .timer.danger { color: #ef4444; }
+        .summary-card { background: linear-gradient(135deg, #334155 0%, #1e293b 100%); border-left: 5px solid #f97316; padding: 1.5rem; border-radius: 0.5rem; }
+        .summary-value { font-size: 2rem; font-weight: bold; color: #f97316; }
+        .summary-label { color: #94a3b8; font-size: 0.875rem; }
+        .additional-tag { display: inline-block; background: #eab308; color: #000; padding: 0.25rem 0.75rem; border-radius: 0.25rem; margin-right: 0.5rem; font-size: 0.875rem; font-weight: bold; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th { background: #334155; padding: 1rem; text-align: left; border-bottom: 2px solid #f97316; }
+        .table td { padding: 1rem; border-bottom: 1px solid #334155; }
+        .table tr:hover { background: #1e293b; }
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .nav-tabs { flex-direction: column; }
+            .nav-btn { width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -118,158 +77,154 @@
     <div class="navbar">
         <div class="logo">🍔 Food Truck Manager</div>
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showSection('dashboard')">📊 Dashboard</button>
-            <button class="nav-tab" onclick="showSection('vendas')">🛒 Vendas</button>
-            <button class="nav-tab" onclick="showSection('cozinha')">👨‍🍳 Cozinha</button>
-            <button class="nav-tab" onclick="showSection('clientes')">👥 Clientes</button>
-            <button class="nav-tab" onclick="showSection('produtos')">📦 Produtos</button>
-            <button class="nav-tab" onclick="showSection('combos')">🎁 Combos</button>
-            <button class="nav-tab" onclick="showSection('estoque')">📋 Estoque</button>
-            <button class="nav-tab" onclick="showSection('despesas')">💸 Despesas</button>
-            <button class="nav-tab" onclick="showSection('desperdicio')">🗑️ Desperdício</button>
-            <button class="nav-tab" onclick="showSection('relatorios')">📈 Relatórios</button>
-            <button class="nav-tab" onclick="showSection('configuracoes')">⚙️ Configurações</button>
+            <button class="nav-btn active" onclick="mostrarSecao('dashboard')">📊 Dashboard</button>
+            <button class="nav-btn" onclick="mostrarSecao('vendas')">🛒 Vendas</button>
+            <button class="nav-btn" onclick="mostrarSecao('cozinha')">👨‍🍳 Cozinha</button>
+            <button class="nav-btn" onclick="mostrarSecao('clientes')">👥 Clientes</button>
+            <button class="nav-btn" onclick="mostrarSecao('produtos')">📦 Produtos</button>
+            <button class="nav-btn" onclick="mostrarSecao('combos')">🎁 Combos</button>
+            <button class="nav-btn" onclick="mostrarSecao('estoque')">📋 Estoque</button>
+            <button class="nav-btn" onclick="mostrarSecao('despesas')">💸 Despesas</button>
+            <button class="nav-btn" onclick="mostrarSecao('relatorios')">📊 Relatórios</button>
+            <button class="nav-btn" onclick="mostrarSecao('config')">⚙️ Config</button>
         </div>
     </div>
 
     <div class="container">
         <!-- DASHBOARD -->
         <div id="dashboard" class="section active">
-            <h1 class="section-title">📊 Dashboard Diário</h1>
+            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">📊 Dashboard</h1>
             
-            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
-                <button class="btn-primary" onclick="exportarPDF()">⬇️ Salvar como PDF</button>
-                <button class="btn-primary" onclick="exportarExcel()">📊 Exportar para Excel</button>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Faturamento Bruto (Hoje)</div>
-                    <div class="stat-value success" id="stat-faturamento">R$ 0,00</div>
+            <div class="grid-3" style="margin-bottom: 2rem;">
+                <div class="summary-card">
+                    <div class="summary-label">Faturamento Bruto</div>
+                    <div class="summary-value" id="faturamento">R$ 0,00</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Lucro Líquido (Hoje)</div>
-                    <div class="stat-value success" id="stat-lucro">R$ 0,00</div>
+                <div class="summary-card">
+                    <div class="summary-label">Lucro Líquido</div>
+                    <div class="summary-value" id="lucro">R$ 0,00</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Desperdício (Hoje)</div>
-                    <div class="stat-value warning" id="stat-desperdicio">R$ 0,00</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Alertas de Estoque Baixo</div>
-                    <div class="stat-value danger" id="stat-alertas">0</div>
+                <div class="summary-card">
+                    <div class="summary-label">Pedidos Hoje</div>
+                    <div class="summary-value" id="pedidosHoje">0</div>
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
-                <div class="cart-section">
-                    <div class="cart-title">Pedidos na Cozinha</div>
-                    <div id="dashboard-cozinha" style="min-height: 200px;">
-                        <p style="color: #888;">Nenhum pedido pendente</p>
-                    </div>
-                </div>
-                <div class="cart-section">
-                    <div class="cart-title">Vendas por Pagamento (Hoje)</div>
-                    <canvas id="chartPagamento" style="max-height: 300px;"></canvas>
-                </div>
+            <h2 style="font-size: 1.5rem; margin: 2rem 0 1rem; color: #f97316;">🍽️ Pedidos Para Entrega</h2>
+            <div id="dashboardEntrega" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <p style="color: #94a3b8;">Nenhum pedido pronto para entrega</p>
             </div>
 
-            <div class="cart-section">
-                <div class="cart-title">Histórico de Vendas (Hoje)</div>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Pedido</th>
-                            <th>Cliente</th>
-                            <th>Produtos</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="dashboard-vendas">
-                        <tr><td colspan="5" style="text-align: center; color: #888;">Nenhuma venda realizada</td></tr>
-                    </tbody>
-                </table>
-            </div>
+            <h2 style="font-size: 1.5rem; margin: 2rem 0 1rem; color: #f97316;">📋 Histórico de Vendas (Hoje)</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Cliente</th>
+                        <th>Produtos</th>
+                        <th>Total</th>
+                        <th>Método</th>
+                        <th>Hora</th>
+                    </tr>
+                </thead>
+                <tbody id="dashboardHistorico">
+                    <tr><td colspan="6" style="text-align: center; color: #94a3b8;">Nenhuma venda realizada</td></tr>
+                </tbody>
+            </table>
         </div>
 
         <!-- VENDAS -->
         <div id="vendas" class="section">
-            <h1 class="section-title">🛒 Vendas</h1>
+            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">🛒 Vendas</h1>
             
-            <div class="sub-tabs">
-                <button class="sub-tab active" onclick="showSubTab('nova-venda', this)">Nova Venda</button>
-                <button class="sub-tab" onclick="showSubTab('historico-vendas', this)">Histórico de Vendas</button>
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                <button class="nav-btn active" onclick="mostrarSubSecao('vendas', 'novaVenda')">Nova Venda</button>
+                <button class="nav-btn" onclick="mostrarSubSecao('vendas', 'historicoVendas')">Histórico de Vendas</button>
             </div>
 
             <!-- NOVA VENDA -->
-            <div id="nova-venda" class="sub-section active">
-                <div class="layout-main">
+            <div id="novaVenda" class="section active">
+                <div class="grid-2">
+                    <!-- PRODUTOS -->
                     <div>
-                        <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: #ff8c00;">Nova Venda</h2>
-                        <div class="grid-products" id="grid-produtos">
-                            <!-- Produtos serão inseridos aqui -->
+                        <h2 style="margin-bottom: 1.5rem; color: #f97316;">Produtos</h2>
+                        <div id="gridProdutos" style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+                            <!-- Preenchido por JS -->
                         </div>
                     </div>
 
-                    <div class="cart-section">
-                        <div class="cart-title">Carrinho de Compras</div>
-
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Tipo de Pedido</label>
-                            <div class="button-group">
-                                <button class="btn-toggle active" onclick="setTipoPedido('local', this)">Local</button>
-                                <button class="btn-toggle" onclick="setTipoPedido('viagem', this)">Para Viagem</button>
+                    <!-- CARRINHO -->
+                    <div class="card">
+                        <h2 style="margin-bottom: 1.5rem; color: #f97316;">🛒 Carrinho de Compras</h2>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Tipo de Pedido</label>
+                            <div style="display: flex; gap: 1rem;">
+                                <button class="btn btn-primary" onclick="app.vendas.tipoPedido='Local'; atualizarCarrinho()">Local</button>
+                                <button class="btn btn-secondary" onclick="app.vendas.tipoPedido='Para Viagem'; atualizarCarrinho()">Para Viagem</button>
                             </div>
                         </div>
 
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Origem</label>
-                            <div class="button-group">
-                                <button class="btn-toggle active" onclick="setOrigem('local', this)">Venda Local</button>
-                                <button class="btn-toggle" onclick="setOrigem('ifood', this)">iFood</button>
+                        <div class="form-group">
+                            <label class="form-label">Origem</label>
+                            <div style="display: flex; gap: 1rem;">
+                                <button class="btn btn-primary" onclick="app.vendas.origem='Venda Local'; atualizarCarrinho()">Venda Local</button>
+                                <button class="btn btn-secondary" onclick="app.vendas.origem='iFood'; atualizarCarrinho()">iFood</button>
                             </div>
                         </div>
 
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Nome do Cliente</label>
-                            <input type="text" class="input-field" id="cliente-nome" placeholder="Buscar ou Adicionar Cliente">
+                        <div class="form-group">
+                            <label class="form-label">Nome do Cliente</label>
+                            <input type="text" class="form-input" id="nomeCliente" placeholder="Buscar ou Adicionar Cliente" onchange="app.vendas.cliente = this.value">
                         </div>
 
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">WhatsApp</label>
-                            <input type="text" class="input-field" id="cliente-whatsapp" placeholder="Opcional">
+                        <div class="form-group">
+                            <label class="form-label">WhatsApp</label>
+                            <input type="text" class="form-input" id="whatsapp" placeholder="Opcional" onchange="app.vendas.whatsapp = this.value">
                         </div>
 
-                        <div id="cart-items" style="margin-bottom: 1.5rem; max-height: 400px; overflow-y: auto;">
-                            <!-- Itens do carrinho -->
+                        <div style="background: #0f172a; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                            <div id="itensCarrinho">
+                                <p style="color: #94a3b8;">Carrinho vazio</p>
+                            </div>
                         </div>
 
-                        <div class="cart-total">
-                            Total: <span id="cart-total">R$ 0,00</span>
+                        <div style="background: #334155; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Subtotal:</span>
+                                <span id="subtotal">R$ 0,00</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Taxa:</span>
+                                <span id="taxa">R$ 0,00</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: bold; color: #22c55e;">
+                                <span>Total:</span>
+                                <span id="totalCarrinho">R$ 0,00</span>
+                            </div>
                         </div>
 
-                        <button class="btn-finish" onclick="finalizarVenda()">✓ Finalizar Venda</button>
+                        <button class="btn btn-success" onclick="finalizarVenda()" style="width: 100%; padding: 1rem;">✓ Finalizar Venda</button>
                     </div>
                 </div>
             </div>
 
             <!-- HISTÓRICO DE VENDAS -->
-            <div id="historico-vendas" class="sub-section">
-                <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: #ff8c00;">Histórico de Vendas</h2>
+            <div id="historicoVendas" class="section">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Pedido</th>
+                            <th>#</th>
                             <th>Cliente</th>
                             <th>Produtos</th>
                             <th>Total</th>
-                            <th>Pagamento</th>
-                            <th>Data/Hora</th>
+                            <th>Método</th>
+                            <th>Status</th>
+                            <th>Hora</th>
                         </tr>
                     </thead>
-                    <tbody id="historico-table">
-                        <tr><td colspan="6" style="text-align: center; color: #888;">Nenhuma venda realizada</td></tr>
+                    <tbody id="tabelaHistoricoVendas">
+                        <tr><td colspan="7" style="text-align: center; color: #94a3b8;">Nenhuma venda realizada</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -277,41 +232,37 @@
 
         <!-- COZINHA -->
         <div id="cozinha" class="section">
-            <h1 class="section-title">👨‍🍳 Pedidos na Cozinha</h1>
-            <div style="text-align: right; margin-bottom: 1rem; color: #888;">Pendentes: <span id="cozinha-pendentes">0</span></div>
-            
-            <div class="kitchen-grid" id="kitchen-orders">
-                <p style="color: #888;">Nenhum pedido pendente</p>
+            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">👨‍🍳 Pedidos na Cozinha</h1>
+            <div style="margin-bottom: 1rem; color: #94a3b8;">Pendentes: <span id="contadorPendentes">0</span></div>
+            <div id="gridCozinha" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
+                <p style="color: #94a3b8;">Nenhum pedido pendente</p>
             </div>
         </div>
 
         <!-- CLIENTES -->
         <div id="clientes" class="section">
-            <h1 class="section-title">👥 Clientes</h1>
-            <button class="btn-primary" onclick="openClienteModal()">+ Novo Cliente</button>
-            
+            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">👥 Clientes</h1>
+            <button class="btn btn-primary" onclick="abrirModal('modalCliente')" style="margin-bottom: 1.5rem;">+ Novo Cliente</button>
             <table class="table">
                 <thead>
                     <tr>
                         <th>Nome</th>
-                        <th>Telefone</th>
-                        <th>Email</th>
-                        <th>Pedidos</th>
+                        <th>WhatsApp</th>
+                        <th>Compras</th>
                         <th>Total Gasto</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody id="clientes-table">
-                    <tr><td colspan="6" style="text-align: center; color: #888;">Nenhum cliente cadastrado</td></tr>
+                <tbody id="tabelaClientes">
+                    <tr><td colspan="5" style="text-align: center; color: #94a3b8;">Nenhum cliente cadastrado</td></tr>
                 </tbody>
             </table>
         </div>
 
         <!-- PRODUTOS -->
         <div id="produtos" class="section">
-            <h1 class="section-title">📦 Produtos</h1>
-            <button class="btn-primary" onclick="openProdutoModal()">+ Novo Produto</button>
-            
+            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">📦 Produtos</h1>
+            <button class="btn btn-primary" onclick="abrirModal('modalProduto')" style="margin-bottom: 1.5rem;">+ Novo Produto</button>
             <table class="table">
                 <thead>
                     <tr>
@@ -322,246 +273,355 @@
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody id="produtos-table">
-                    <tr><td colspan="5" style="text-align: center; color: #888;">Nenhum produto cadastrado</td></tr>
+                <tbody id="tabelaProdutos">
+                    <tr><td colspan="5" style="text-align: center; color: #94a3b8;">Nenhum produto cadastrado</td></tr>
                 </tbody>
             </table>
         </div>
 
         <!-- COMBOS -->
         <div id="combos" class="section">
-            <h1 class="section-title">🎁 Combos</h1>
-            <button class="btn-primary" onclick="openComboModal()">+ Novo Combo</button>
-            
+            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">🎁 Combos</h1>
+            <button class="btn btn-primary" onclick="abrirModal('modalCombo')" style="margin-bottom: 1.5rem;">+ Novo Combo</button>
             <table class="table">
                 <thead>
                     <tr>
                         <th>Nome</th>
                         <th>Produtos</th>
                         <th>Preço</th>
-                        <th>Economia</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody id="combos-table">
-                    <tr><td colspan="5" style="text-align: center; color: #888;">Nenhum combo cadastrado</td></tr>
+                <tbody id="tabelaCombos">
+                    <tr><td colspan="4" style="text-align: center; color: #94a3b8;">Nenhum combo cadastrado</td></tr>
                 </tbody>
             </table>
         </div>
 
         <!-- ESTOQUE -->
         <div id="estoque" class="section">
-            <h1 class="section-title">📋 Gerenciar Estoque</h1>
-            <button class="btn-primary" onclick="openEstoqueModal()">+ Novo Ingrediente</button>
-            
+            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">📋 Estoque</h1>
+            <button class="btn btn-primary" onclick="abrirModal('modalIngrediente')" style="margin-bottom: 1.5rem;">+ Novo Ingrediente</button>
             <table class="table">
                 <thead>
                     <tr>
                         <th>Ingrediente</th>
-                        <th>Estoque Atual</th>
-                        <th>Preço por Unidade</th>
-                        <th>Alerta Estoque Baixo</th>
+                        <th>Estoque</th>
+                        <th>Preço Unit.</th>
+                        <th>Total</th>
+                        <th>Alerta</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody id="estoque-table">
-                    <tr><td colspan="5" style="text-align: center; color: #888;">Nenhum ingrediente cadastrado</td></tr>
+                <tbody id="tabelaEstoque">
+                    <tr><td colspan="6" style="text-align: center; color: #94a3b8;">Nenhum ingrediente cadastrado</td></tr>
                 </tbody>
             </table>
         </div>
 
         <!-- DESPESAS -->
         <div id="despesas" class="section">
-            <h1 class="section-title">💸 Gerenciar Despesas</h1>
-            <div class="date-info" id="data-despesas">27 de outubro de 2025</div>
-            <button class="btn-primary" onclick="openDespesaModal()">+ Nova Despesa</button>
-            
+            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">💸 Despesas</h1>
+            <button class="btn btn-primary" onclick="abrirModal('modalDespesa')" style="margin-bottom: 1.5rem;">+ Nova Despesa</button>
+            <button class="btn btn-primary" onclick="abrirModal('modalDesperdicio')" style="margin-bottom: 1.5rem;">+ Registrar Desperdício</button>
             <table class="table">
                 <thead>
                     <tr>
                         <th>Descrição</th>
                         <th>Categoria</th>
                         <th>Valor</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="despesas-table">
-                    <tr><td colspan="4" style="text-align: center; color: #888;">Nenhuma despesa cadastrada</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- DESPERDÍCIO -->
-        <div id="desperdicio" class="section">
-            <h1 class="section-title">🗑️ Desperdício</h1>
-            <button class="btn-primary" onclick="openDesperdícioModal()">+ Registrar Desperdício</button>
-            
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Produto/Ingrediente</th>
-                        <th>Quantidade</th>
-                        <th>Valor</th>
-                        <th>Motivo</th>
                         <th>Data</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody id="desperdicio-table">
-                    <tr><td colspan="6" style="text-align: center; color: #888;">Nenhum desperdício registrado</td></tr>
+                <tbody id="tabelaDespesas">
+                    <tr><td colspan="5" style="text-align: center; color: #94a3b8;">Nenhuma despesa registrada</td></tr>
                 </tbody>
             </table>
         </div>
 
         <!-- RELATÓRIOS -->
         <div id="relatorios" class="section">
-            <h1 class="section-title">📈 Relatórios</h1>
-            
-            <div class="cart-section" style="margin-bottom: 2rem;">
-                <h2 style="margin-bottom: 1rem;">Filtrar Período</h2>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div>
-                        <label style="display: block; margin-bottom: 0.5rem;">Data Inicial</label>
-                        <input type="date" class="input-field" id="data-inicio">
-                    </div>
-                    <div>
-                        <label style="display: block; margin-bottom: 0.5rem;">Data Final</label>
-                        <input type="date" class="input-field" id="data-fim">
-                    </div>
+            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">📊 Relatórios</h1>
+            <div style="margin-bottom: 2rem;">
+                <button class="btn btn-primary" onclick="exportarPDF()" style="margin-right: 1rem;">⬇️ Salvar como PDF</button>
+                <button class="btn btn-primary" onclick="exportarExcel()">📊 Exportar para Excel</button>
+            </div>
+            <div class="grid-3" style="margin-bottom: 2rem;">
+                <div class="summary-card">
+                    <div class="summary-label">Faturamento</div>
+                    <div class="summary-value" id="relFaturamento">R$ 0,00</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">CMV</div>
+                    <div class="summary-value" id="relCMV">R$ 0,00</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Lucro Bruto</div>
+                    <div class="summary-value" id="relLucroBruto">R$ 0,00</div>
                 </div>
             </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Faturamento Bruto</div>
-                    <div class="stat-value success" id="rel-faturamento">R$ 0,00</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">CMV (Custo)</div>
-                    <div class="stat-value info" id="rel-cmv">R$ 0,00</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Despesas</div>
-                    <div class="stat-value danger" id="rel-despesas">R$ 0,00</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Desperdício</div>
-                    <div class="stat-value warning" id="rel-desperdicio">R$ 0,00</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Lucro Líquido</div>
-                    <div class="stat-value success" id="rel-lucro">R$ 0,00</div>
-                </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
-                <div class="cart-section">
-                    <h2 style="margin-bottom: 1rem;">Evolução Financeira por Dia</h2>
-                    <canvas id="chartEvolucao" style="max-height: 300px;"></canvas>
-                </div>
-                <div class="cart-section">
-                    <h2 style="margin-bottom: 1rem;">Top 5 Produtos (por Quantidade)</h2>
-                    <canvas id="chartTop5" style="max-height: 300px;"></canvas>
-                </div>
-            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Cliente</th>
+                        <th>Produtos</th>
+                        <th>Total</th>
+                        <th>Custo</th>
+                        <th>Lucro</th>
+                        <th>Método</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaRelatorios">
+                    <tr><td colspan="8" style="text-align: center; color: #94a3b8;">Nenhuma venda</td></tr>
+                </tbody>
+            </table>
         </div>
 
         <!-- CONFIGURAÇÕES -->
-        <div id="configuracoes" class="section">
-            <h1 class="section-title">⚙️ Configurações</h1>
-            
-            <div class="cart-section" style="max-width: 600px;">
-                <h2 style="margin-bottom: 1.5rem;">Taxas da Máquina de Cartão</h2>
-                
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Taxa de Débito (%)</label>
-                    <input type="number" class="input-field" id="taxa-debito" value="1.9" step="0.1">
+        <div id="config" class="section">
+            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">⚙️ Configurações</h1>
+            <div class="card" style="max-width: 500px;">
+                <h2 style="margin-bottom: 1.5rem; color: #f97316;">Taxas de Pagamento</h2>
+                <div class="form-group">
+                    <label class="form-label">Taxa de Débito (%)</label>
+                    <input type="number" class="form-input" id="taxaDebito" value="1.5" onchange="app.config.taxaDebito = parseFloat(this.value); salvarDados()">
                 </div>
-
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Taxa de Crédito (%)</label>
-                    <input type="number" class="input-field" id="taxa-credito" value="4.5" step="0.1">
+                <div class="form-group">
+                    <label class="form-label">Taxa de Crédito (%)</label>
+                    <input type="number" class="form-input" id="taxaCredito" value="2.5" onchange="app.config.taxaCredito = parseFloat(this.value); salvarDados()">
                 </div>
-
-                <button class="btn-primary" onclick="salvarConfiguracoes()">Salvar</button>
-            </div>
-
-            <div class="cart-section" style="max-width: 600px; margin-top: 2rem;">
-                <h2 style="margin-bottom: 1.5rem;">Adicionais</h2>
-                
-                <div id="adicionais-list" style="margin-bottom: 1.5rem;">
-                    <!-- Adicionais serão listados aqui -->
-                </div>
-
-                <div style="display: flex; gap: 0.5rem;">
-                    <input type="text" class="input-field" id="novo-adicional-nome" placeholder="Nome do Adicional" style="flex: 1; margin-bottom: 0;">
-                    <input type="number" class="input-field" id="novo-adicional-preco" placeholder="Preço (R$)" step="0.01" style="width: 150px; margin-bottom: 0;">
-                    <button class="btn-primary" onclick="adicionarAdicional()" style="padding: 0.8rem; margin-bottom: 0;">+</button>
-                </div>
+                <button class="btn btn-success" onclick="salvarDados()" style="width: 100%;">Salvar</button>
             </div>
         </div>
     </div>
 
-    <!-- MODALS -->
+    <!-- MODAIS -->
+    <!-- Modal Produto -->
     <div id="modalProduto" class="modal">
         <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('modalProduto')">×</button>
-            <div class="modal-title">Personalizar Produto</div>
-            
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Adicionais</label>
-                <div class="checkbox-group" id="modal-adicionais">
-                    <!-- Adicionais serão inseridos aqui -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <div class="modal-header">Novo Produto</div>
+                <button class="btn btn-secondary" onclick="fecharModal('modalProduto')">×</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Nome</label>
+                <input type="text" class="form-input" id="produtoNome" placeholder="Ex: Hamburguer Clássico">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Preço (R$)</label>
+                <input type="number" class="form-input" id="produtoPreco" placeholder="25.00" step="0.01">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Custo (R$)</label>
+                <input type="number" class="form-input" id="produtoCusto" placeholder="8.00" step="0.01">
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-secondary" onclick="fecharModal('modalProduto')" style="flex: 1;">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarProduto()" style="flex: 1;">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ingrediente -->
+    <div id="modalIngrediente" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <div class="modal-header">Novo Ingrediente</div>
+                <button class="btn btn-secondary" onclick="fecharModal('modalIngrediente')">×</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Nome</label>
+                <input type="text" class="form-input" id="ingredienteNome" placeholder="Ex: Carne Moída">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Quantidade</label>
+                <input type="number" class="form-input" id="ingredienteQtd" placeholder="1000" step="0.01">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Unidade</label>
+                <input type="text" class="form-input" id="ingredienteUnidade" placeholder="g, un, L, etc">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Preço Unitário (R$)</label>
+                <input type="number" class="form-input" id="ingredientePreco" placeholder="0.05" step="0.01">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Alerta Estoque Baixo</label>
+                <input type="number" class="form-input" id="ingredienteAlerta" placeholder="100">
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-secondary" onclick="fecharModal('modalIngrediente')" style="flex: 1;">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarIngrediente()" style="flex: 1;">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Despesa -->
+    <div id="modalDespesa" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <div class="modal-header">Nova Despesa</div>
+                <button class="btn btn-secondary" onclick="fecharModal('modalDespesa')">×</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Descrição</label>
+                <input type="text" class="form-input" id="despesaDesc" placeholder="Ex: Aluguel do Ponto">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Categoria</label>
+                <select class="form-input" id="despesaCat">
+                    <option>Aluguel</option>
+                    <option>Combustível</option>
+                    <option>Manutenção</option>
+                    <option>Utensílios</option>
+                    <option>Outros</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Valor (R$)</label>
+                <input type="number" class="form-input" id="despesaValor" placeholder="0.00" step="0.01">
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-secondary" onclick="fecharModal('modalDespesa')" style="flex: 1;">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarDespesa()" style="flex: 1;">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Desperdício -->
+    <div id="modalDesperdicio" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <div class="modal-header">Registrar Desperdício</div>
+                <button class="btn btn-secondary" onclick="fecharModal('modalDesperdicio')">×</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Ingrediente</label>
+                <select class="form-input" id="desperdicioIngrediente">
+                    <option>Selecione um ingrediente</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Quantidade</label>
+                <input type="number" class="form-input" id="desperdicioQtd" placeholder="100" step="0.01">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Motivo</label>
+                <input type="text" class="form-input" id="desperdicioMotivo" placeholder="Ex: Vencimento, Dano, etc">
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-secondary" onclick="fecharModal('modalDesperdicio')" style="flex: 1;">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarDesperdicio()" style="flex: 1;">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Combo -->
+    <div id="modalCombo" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <div class="modal-header">Novo Combo</div>
+                <button class="btn btn-secondary" onclick="fecharModal('modalCombo')">×</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Nome</label>
+                <input type="text" class="form-input" id="comboNome" placeholder="Ex: Combo Executivo">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Preço (R$)</label>
+                <input type="number" class="form-input" id="comboPreco" placeholder="45.00" step="0.01">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Produtos</label>
+                <div id="comboProdutos" class="checkbox-group">
+                    <!-- Preenchido por JS -->
                 </div>
             </div>
-
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Observações Adicionais</label>
-                <textarea class="textarea-field" id="modal-observacoes" placeholder="Ex: Ponto da carne, sem picles, etc."></textarea>
-            </div>
-
-            <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeModal('modalProduto')">Cancelar</button>
-                <button class="btn-save" onclick="adicionarAoCarrinho()">Salvar Alterações</button>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-secondary" onclick="fecharModal('modalCombo')" style="flex: 1;">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarCombo()" style="flex: 1;">Salvar</button>
             </div>
         </div>
     </div>
 
+    <!-- Modal Cliente -->
+    <div id="modalCliente" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <div class="modal-header">Novo Cliente</div>
+                <button class="btn btn-secondary" onclick="fecharModal('modalCliente')">×</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Nome</label>
+                <input type="text" class="form-input" id="clienteNome" placeholder="Ex: João Silva">
+            </div>
+            <div class="form-group">
+                <label class="form-label">WhatsApp</label>
+                <input type="text" class="form-input" id="clienteWhatsapp" placeholder="11999999999">
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-secondary" onclick="fecharModal('modalCliente')" style="flex: 1;">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarCliente()" style="flex: 1;">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Pagamento -->
     <div id="modalPagamento" class="modal">
         <div class="modal-content" style="max-width: 400px;">
-            <button class="modal-close" onclick="closeModal('modalPagamento')">×</button>
-            <div class="modal-title">Método de Pagamento</div>
-            
-            <div class="payment-modal">
-                <button class="payment-btn" onclick="processarPagamento('dinheiro')">💵 Dinheiro</button>
-                <button class="payment-btn" onclick="processarPagamento('debito')">🏧 Débito</button>
-                <button class="payment-btn" onclick="processarPagamento('credito')">💳 Crédito</button>
-                <button class="payment-btn" onclick="processarPagamento('pix')">📱 PIX</button>
+            <div class="modal-header" style="margin-bottom: 2rem;">Método de Pagamento</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                <button class="btn btn-success" onclick="processarPagamento('Dinheiro')" style="padding: 2rem;">💵 Dinheiro</button>
+                <button class="btn btn-primary" onclick="processarPagamento('Débito')" style="padding: 2rem;">🏧 Débito</button>
+                <button class="btn btn-primary" onclick="processarPagamento('Crédito')" style="padding: 2rem;">💳 Crédito</button>
+                <button class="btn btn-primary" onclick="processarPagamento('PIX')" style="padding: 2rem;">📱 PIX</button>
             </div>
-
-            <button class="btn-cancel" style="width: 100%; margin-top: 1rem;" onclick="closeModal('modalPagamento')">Cancelar</button>
+            <button class="btn btn-secondary" onclick="fecharModal('modalPagamento')" style="width: 100%;">Cancelar</button>
         </div>
     </div>
 
+    <!-- Modal Sucesso -->
     <div id="modalSucesso" class="modal">
         <div class="modal-content" style="max-width: 400px; text-align: center;">
-            <div class="success-icon">✓</div>
-            <div class="modal-title">Venda Realizada!</div>
-            <div style="margin-bottom: 2rem; color: #888;">
-                <p>Número do Pedido: <strong id="sucesso-numero" style="color: #ff8c00;">-</strong></p>
-                <p>Total: <strong id="sucesso-total" style="color: #4ade80;">-</strong></p>
+            <div style="font-size: 3rem; margin-bottom: 1rem;">✓</div>
+            <div class="modal-header" style="margin-bottom: 1rem;">Venda Realizada!</div>
+            <div style="margin-bottom: 1rem;">
+                <div style="color: #94a3b8; margin-bottom: 0.5rem;">Número do Pedido:</div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #f97316;" id="numeroPedidoSucesso">#1</div>
             </div>
-            <button class="btn-primary" onclick="closeModal('modalSucesso')">OK</button>
+            <div style="margin-bottom: 2rem;">
+                <div style="color: #94a3b8; margin-bottom: 0.5rem;">Total:</div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #22c55e;" id="totalSucesso">R$ 0,00</div>
+            </div>
+            <button class="btn btn-success" onclick="fecharModal('modalSucesso'); mostrarSecao('vendas')" style="width: 100%;">OK</button>
         </div>
     </div>
 
     <script>
         // DADOS GLOBAIS
-        const db = {
+        const app = {
+            vendas: {
+                cliente: '',
+                whatsapp: '',
+                tipoPedido: 'Local',
+                origem: 'Venda Local',
+                itens: [],
+                metodo: ''
+            },
+            config: {
+                taxaDebito: 1.5,
+                taxaCredito: 2.5
+            }
+        };
+
+        let dados = {
             produtos: [
-                { id: 1, nome: 'Hamburguer Clássico', preco: 25.00, custo: 8.00, imagem: '🍔' },
-                { id: 2, nome: 'Hamburguer Especial', preco: 35.00, custo: 12.00, imagem: '🍔' },
-                { id: 3, nome: 'Churrascão de Alcatra', preco: 15.00, custo: 6.45, imagem: '🍢' }
+                { id: 1, nome: '🍔 Hamburguer Clássico', preco: 25.00, custo: 8.00, adicionais: [1, 2] },
+                { id: 2, nome: '🍔 Hamburguer Especial', preco: 35.00, custo: 12.00, adicionais: [1, 2, 3, 4] },
+                { id: 3, nome: '🍢 Churrascão de Alcatra', preco: 15.00, custo: 6.45, adicionais: [1, 2] }
             ],
             adicionais: [
                 { id: 1, nome: 'Maionese Temperada', preco: 2.00 },
@@ -570,535 +630,745 @@
                 { id: 4, nome: 'Bacon Extra', preco: 4.00 },
                 { id: 5, nome: 'Sem Cebola', preco: 0.00 }
             ],
-            ingredientes: [
-                { id: 1, nome: 'Pão de Hamburguer', estoque: 98, preco: 1.50, alerta: 20 },
-                { id: 2, nome: 'Carne de Hamburguer (150g)', estoque: 48, preco: 4.00, alerta: 10 },
-                { id: 3, nome: 'Queijo Cheddar', estoque: 1960, preco: 0.08, alerta: 300 },
-                { id: 4, nome: 'Alcatra para Churrasco', estoque: 5000, preco: 0.07, alerta: 1000 },
-                { id: 5, nome: 'Espeto de madeira', estoque: 200, preco: 0.10, alerta: 50 },
-                { id: 6, nome: 'Sal Grosso', estoque: 1000, preco: 0.01, alerta: 200 }
-            ],
             vendas: [],
-            pedidosCozinha: [],
-            despesas: [],
-            desperdicio: [],
+            pedidos: [],
             clientes: [],
-            configuracoes: {
-                taxaDebito: 1.9,
-                taxaCredito: 4.5
-            }
+            ingredientes: [],
+            despesas: [],
+            combos: [],
+            desperdicio: []
         };
 
-        let carrinho = [];
-        let tipoPedido = 'local';
-        let origem = 'local';
-        let produtoSelecionado = null;
-
-        // FUNÇÕES PRINCIPAIS
-        function showSection(sectionId) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById(sectionId).classList.add('active');
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            if (sectionId === 'vendas') renderizarProdutos();
-            if (sectionId === 'cozinha') renderizarCozinha();
-            if (sectionId === 'produtos') renderizarProdutos();
-            if (sectionId === 'estoque') renderizarEstoque();
-            if (sectionId === 'despesas') renderizarDespesas();
-            if (sectionId === 'relatorios') renderizarRelatorios();
-            if (sectionId === 'configuracoes') renderizarConfiguracoes();
-            if (sectionId === 'dashboard') renderizarDashboard();
-        }
-
-        function showSubTab(tabId, element) {
-            const parent = element.parentElement;
-            parent.querySelectorAll('.sub-section').forEach(s => s.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            parent.parentElement.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
-            element.classList.add('active');
-        }
-
-        function renderizarProdutos() {
-            const grid = document.getElementById('grid-produtos');
-            if (!grid) return;
-            
-            grid.innerHTML = db.produtos.map(p => `
-                <div class="product-card" onclick="selecionarProduto(${p.id})">
-                    <div class="product-image">${p.imagem}</div>
-                    <div class="product-name">${p.nome}</div>
-                    <div class="product-price">R$ ${p.preco.toFixed(2)}</div>
-                    <div class="product-profit">Lucro R$ ${(p.preco - p.custo).toFixed(2)}</div>
-                </div>
-            `).join('');
-
-            const table = document.getElementById('produtos-table');
-            if (table) {
-                table.innerHTML = db.produtos.map(p => `
-                    <tr>
-                        <td>${p.nome}</td>
-                        <td>R$ ${p.preco.toFixed(2)}</td>
-                        <td>R$ ${p.custo.toFixed(2)}</td>
-                        <td>R$ ${(p.preco - p.custo).toFixed(2)}</td>
-                        <td class="action-buttons">
-                            <button class="btn-edit" onclick="editarProduto(${p.id})">✏️</button>
-                            <button class="btn-delete" onclick="deletarProduto(${p.id})">🗑️</button>
-                        </td>
-                    </tr>
-                `).join('');
+        // CARREGAR DADOS
+        function carregarDados() {
+            const saved = localStorage.getItem('foodTruckData');
+            if (saved) {
+                dados = JSON.parse(saved);
             }
+            const configSaved = localStorage.getItem('foodTruckConfig');
+            if (configSaved) {
+                app.config = JSON.parse(configSaved);
+                document.getElementById('taxaDebito').value = app.config.taxaDebito;
+                document.getElementById('taxaCredito').value = app.config.taxaCredito;
+            }
+            atualizarUI();
         }
 
-        function selecionarProduto(produtoId) {
-            produtoSelecionado = db.produtos.find(p => p.id === produtoId);
-            const modal = document.getElementById('modalProduto');
-            modal.querySelector('.modal-title').textContent = `Personalizar ${produtoSelecionado.nome}`;
-            
-            const adicionaisDiv = document.getElementById('modal-adicionais');
-            adicionaisDiv.innerHTML = db.adicionais.map((a, i) => `
-                <div class="checkbox-item">
-                    <input type="checkbox" id="adicional-${a.id}">
-                    <label for="adicional-${a.id}">${a.nome}</label>
-                    <span class="checkbox-price">R$ ${a.preco.toFixed(2)}</span>
-                </div>
-            `).join('');
-            
-            openModal('modalProduto');
+        // SALVAR DADOS
+        function salvarDados() {
+            localStorage.setItem('foodTruckData', JSON.stringify(dados));
+            localStorage.setItem('foodTruckConfig', JSON.stringify(app.config));
+            atualizarUI();
         }
 
-        function adicionarAoCarrinho() {
-            const adicionaisSelecionados = [];
-            let precoAdicionais = 0;
-            
-            db.adicionais.forEach(a => {
-                if (document.getElementById(`adicional-${a.id}`)?.checked) {
-                    adicionaisSelecionados.push(a.nome);
-                    precoAdicionais += a.preco;
-                }
+        // MOSTRAR SEÇÃO
+        function mostrarSecao(secao) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(secao).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            atualizarUI();
+        }
+
+        // MOSTRAR SUB-SEÇÃO
+        function mostrarSubSecao(pai, sub) {
+            document.querySelectorAll(`#${pai} .section`).forEach(s => s.classList.remove('active'));
+            document.getElementById(sub).classList.add('active');
+            event.target.parentElement.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // ABRIR/FECHAR MODAL
+        function abrirModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function fecharModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // ADICIONAR PRODUTO AO CARRINHO
+        function adicionarAoCarrinho(produtoId) {
+            const produto = dados.produtos.find(p => p.id === produtoId);
+            if (!produto) return;
+
+            app.vendas.itens.push({
+                id: produtoId,
+                nome: produto.nome,
+                preco: produto.preco,
+                custo: produto.custo,
+                adicionais: [],
+                observacoes: ''
             });
 
-            const observacoes = document.getElementById('modal-observacoes').value;
-
-            const item = {
-                id: Math.random(),
-                produto: produtoSelecionado,
-                quantidade: 1,
-                adicionais: adicionaisSelecionados,
-                observacoes: observacoes,
-                precoAdicionais: precoAdicionais,
-                precoTotal: produtoSelecionado.preco + precoAdicionais
-            };
-
-            carrinho.push(item);
             atualizarCarrinho();
-            closeModal('modalProduto');
-            document.getElementById('modal-observacoes').value = '';
         }
 
+        // ATUALIZAR CARRINHO
         function atualizarCarrinho() {
-            const cartDiv = document.getElementById('cart-items');
-            const totalDiv = document.getElementById('cart-total');
-
-            if (carrinho.length === 0) {
-                cartDiv.innerHTML = '<p style="color: #888;">Carrinho vazio</p>';
-                totalDiv.textContent = 'R$ 0,00';
+            const container = document.getElementById('itensCarrinho');
+            
+            if (app.vendas.itens.length === 0) {
+                container.innerHTML = '<p style="color: #94a3b8;">Carrinho vazio</p>';
+                document.getElementById('subtotal').textContent = 'R$ 0,00';
+                document.getElementById('taxa').textContent = 'R$ 0,00';
+                document.getElementById('totalCarrinho').textContent = 'R$ 0,00';
                 return;
             }
 
-            let total = 0;
-            cartDiv.innerHTML = carrinho.map((item, idx) => {
-                const subtotal = item.precoTotal * item.quantidade;
-                total += subtotal;
-                return `
-                    <div class="cart-item">
-                        <div>
-                            <div class="cart-item-name">${item.produto.nome}</div>
-                            <div class="cart-item-price">R$ ${item.precoTotal.toFixed(2)}</div>
-                            ${item.adicionais.length > 0 ? `<div class="cart-item-extras">+ ${item.adicionais.join(', ')}</div>` : ''}
+            let html = '';
+            let subtotal = 0;
+
+            app.vendas.itens.forEach((item, idx) => {
+                let precoItem = item.preco;
+                let adicionaisHtml = '';
+                
+                if (item.adicionais && item.adicionais.length > 0) {
+                    item.adicionais.forEach(adId => {
+                        const ad = dados.adicionais.find(a => a.id === adId);
+                        if (ad) {
+                            precoItem += ad.preco;
+                            adicionaisHtml += `<span class="additional-tag">${ad.nome}</span>`;
+                        }
+                    });
+                }
+
+                subtotal += precoItem;
+
+                html += `
+                    <div style="background: #0f172a; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; border-left: 3px solid #f97316;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                            <div>
+                                <div style="font-weight: bold;">${item.nome}</div>
+                                <div style="color: #94a3b8; font-size: 0.875rem;">${adicionaisHtml}</div>
+                            </div>
+                            <button class="btn btn-danger" onclick="removerDoCarrinho(${idx})" style="padding: 0.25rem 0.75rem;">✕</button>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <input type="number" value="${item.quantidade}" min="1" onchange="atualizarQuantidade(${idx}, this.value)" class="input-number">
-                            <button class="btn-danger" onclick="removerDoCarrinho(${idx})">✕</button>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="color: #94a3b8;">
+                                <input type="number" value="1" min="1" style="width: 50px; padding: 0.25rem; background: #1e293b; border: 1px solid #334155; color: #e2e8f0; border-radius: 0.25rem;" onchange="app.vendas.itens[${idx}].quantidade = parseInt(this.value); atualizarCarrinho()">
+                            </div>
+                            <div style="font-weight: bold; color: #f97316;">R$ ${precoItem.toFixed(2)}</div>
                         </div>
                     </div>
                 `;
-            }).join('');
-
-            totalDiv.textContent = `R$ ${total.toFixed(2)}`;
-        }
-
-        function atualizarQuantidade(idx, qtd) {
-            carrinho[idx].quantidade = parseInt(qtd) || 1;
-            atualizarCarrinho();
-        }
-
-        function removerDoCarrinho(idx) {
-            carrinho.splice(idx, 1);
-            atualizarCarrinho();
-        }
-
-        function setTipoPedido(tipo, element) {
-            tipoPedido = tipo;
-            element.parentElement.querySelectorAll('.btn-toggle').forEach(b => b.classList.remove('active'));
-            element.classList.add('active');
-        }
-
-        function setOrigem(o, element) {
-            origem = o;
-            element.parentElement.querySelectorAll('.btn-toggle').forEach(b => b.classList.remove('active'));
-            element.classList.add('active');
-        }
-
-        function finalizarVenda() {
-            if (carrinho.length === 0) {
-                alert('Carrinho vazio!');
-                return;
-            }
-
-            const nome = document.getElementById('cliente-nome').value || 'Cliente Anônimo';
-            const whatsapp = document.getElementById('cliente-whatsapp').value || '';
-
-            openModal('modalPagamento');
-        }
-
-        function processarPagamento(metodo) {
-            const nome = document.getElementById('cliente-nome').value || 'Cliente Anônimo';
-            const whatsapp = document.getElementById('cliente-whatsapp').value || '';
-
-            let taxaDesconto = 0;
-            if (metodo === 'debito') taxaDesconto = db.configuracoes.taxaDebito;
-            if (metodo === 'credito') taxaDesconto = db.configuracoes.taxaCredito;
-
-            let total = carrinho.reduce((sum, item) => sum + (item.precoTotal * item.quantidade), 0);
-            const taxa = (total * taxaDesconto) / 100;
-            const totalComTaxa = total - taxa;
-
-            const venda = {
-                id: db.vendas.length + 1,
-                cliente: nome,
-                whatsapp: whatsapp,
-                produtos: carrinho,
-                tipoPedido: tipoPedido,
-                origem: origem,
-                total: total,
-                taxa: taxa,
-                totalComTaxa: totalComTaxa,
-                metodo: metodo,
-                data: new Date(),
-                status: 'entregue'
-            };
-
-            db.vendas.push(venda);
-
-            const pedido = {
-                id: venda.id,
-                cliente: nome,
-                whatsapp: whatsapp,
-                produtos: carrinho,
-                tipoPedido: tipoPedido,
-                origem: origem,
-                status: 'pendente',
-                tempo: 0,
-                data: new Date()
-            };
-
-            db.pedidosCozinha.push(pedido);
-
-            closeModal('modalPagamento');
-            document.getElementById('sucesso-numero').textContent = `#${venda.id}`;
-            document.getElementById('sucesso-total').textContent = `R$ ${totalComTaxa.toFixed(2)}`;
-            openModal('modalSucesso');
-
-            carrinho = [];
-            document.getElementById('cliente-nome').value = '';
-            document.getElementById('cliente-whatsapp').value = '';
-            atualizarCarrinho();
-
-            salvarDados();
-            renderizarDashboard();
-        }
-
-        function renderizarCozinha() {
-            const kitchenDiv = document.getElementById('kitchen-orders');
-            const pendentes = db.pedidosCozinha.filter(p => p.status === 'pendente');
-
-            document.getElementById('cozinha-pendentes').textContent = pendentes.length;
-
-            if (pendentes.length === 0) {
-                kitchenDiv.innerHTML = '<p style="color: #888;">Nenhum pedido pendente</p>';
-                return;
-            }
-
-            kitchenDiv.innerHTML = pendentes.map(pedido => `
-                <div class="order-card ${pedido.tempo > 600 ? 'expired' : ''}">
-                    <div class="order-header">
-                        <div class="order-number">#${pedido.id}</div>
-                        <div class="order-type ${pedido.tipoPedido === 'viagem' ? 'delivery' : ''}">${pedido.tipoPedido === 'viagem' ? '📦 Para Viagem' : '🏪 Local'}</div>
-                    </div>
-                    <div class="order-client">${pedido.cliente}</div>
-                    <div class="order-timer">⏱️ ${formatarTempo(pedido.tempo)}</div>
-                    <div class="order-items">
-                        ${pedido.produtos.map(p => `
-                            <div class="order-item">
-                                <div class="order-item-name">1x ${p.produto.nome}</div>
-                                ${p.adicionais.length > 0 ? `<div class="order-item-extra">+ ${p.adicionais.join(', ')}</div>` : ''}
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="order-buttons">
-                        <button class="btn-ready" onclick="marcarPronto(${pedido.id})">✓ PRONTO</button>
-                        <button class="btn-cancel-order" onclick="cancelarPedido(${pedido.id})">🗑️ Cancelar</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function marcarPronto(pedidoId) {
-            const pedido = db.pedidosCozinha.find(p => p.id === pedidoId);
-            if (pedido) {
-                pedido.status = 'pronto';
-                renderizarCozinha();
-                salvarDados();
-            }
-        }
-
-        function cancelarPedido(pedidoId) {
-            db.pedidosCozinha = db.pedidosCozinha.filter(p => p.id !== pedidoId);
-            renderizarCozinha();
-            salvarDados();
-        }
-
-        function formatarTempo(segundos) {
-            const mins = Math.floor(segundos / 60);
-            const secs = segundos % 60;
-            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        function renderizarEstoque() {
-            const table = document.getElementById('estoque-table');
-            table.innerHTML = db.ingredientes.map(ing => `
-                <tr>
-                    <td>${ing.nome}</td>
-                    <td>${ing.estoque} un</td>
-                    <td>R$ ${ing.preco.toFixed(2)} / un</td>
-                    <td>${ing.alerta} un</td>
-                    <td class="action-buttons">
-                        <button class="btn-edit" onclick="editarIngrediente(${ing.id})">✏️</button>
-                        <button class="btn-delete" onclick="deletarIngrediente(${ing.id})">🗑️</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function renderizarDespesas() {
-            const table = document.getElementById('despesas-table');
-            table.innerHTML = db.despesas.map(desp => `
-                <tr>
-                    <td>${desp.descricao}</td>
-                    <td><span class="badge badge-category">${desp.categoria}</span></td>
-                    <td>R$ ${desp.valor.toFixed(2)}</td>
-                    <td class="action-buttons">
-                        <button class="btn-edit" onclick="editarDespesa(${desp.id})">✏️</button>
-                        <button class="btn-delete" onclick="deletarDespesa(${desp.id})">🗑️</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function renderizarDashboard() {
-            const hoje = new Date().toDateString();
-            const vendasHoje = db.vendas.filter(v => new Date(v.data).toDateString() === hoje);
-            
-            let faturamento = 0, lucro = 0;
-            vendasHoje.forEach(v => {
-                faturamento += v.total;
-                lucro += (v.totalComTaxa - v.taxa);
             });
 
-            document.getElementById('stat-faturamento').textContent = `R$ ${faturamento.toFixed(2)}`;
-            document.getElementById('stat-lucro').textContent = `R$ ${lucro.toFixed(2)}`;
-            document.getElementById('stat-desperdicio').textContent = 'R$ 0,00';
-            document.getElementById('stat-alertas').textContent = '0';
+            container.innerHTML = html;
 
-            // Histórico
-            const historico = document.getElementById('dashboard-vendas');
-            if (vendasHoje.length === 0) {
-                historico.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888;">Nenhuma venda realizada</td></tr>';
-            } else {
-                historico.innerHTML = vendasHoje.map(v => `
-                    <tr>
-                        <td>#${v.id}</td>
-                        <td>${v.cliente}</td>
-                        <td>${v.produtos.map(p => p.produto.nome).join(', ')}</td>
-                        <td>R$ ${v.totalComTaxa.toFixed(2)}</td>
-                        <td><span class="badge badge-success">Entregue</span></td>
-                    </tr>
-                `).join('');
+            let taxa = 0;
+            if (app.vendas.metodo === 'Débito') {
+                taxa = subtotal * (app.config.taxaDebito / 100);
+            } else if (app.vendas.metodo === 'Crédito') {
+                taxa = subtotal * (app.config.taxaCredito / 100);
             }
 
-            // Cozinha
-            const cozinhaDiv = document.getElementById('dashboard-cozinha');
-            const pendentes = db.pedidosCozinha.filter(p => p.status === 'pendente');
-            if (pendentes.length === 0) {
-                cozinhaDiv.innerHTML = '<p style="color: #888;">Nenhum pedido pendente</p>';
-            } else {
-                cozinhaDiv.innerHTML = pendentes.map(p => `
-                    <div style="background: #1a2f4f; padding: 1rem; border-radius: 4px; margin-bottom: 0.5rem;">
-                        <div style="color: #ff8c00; font-weight: bold;">#${p.id} - ${p.cliente}</div>
-                        <div style="color: #888; font-size: 0.9rem;">1x ${p.produtos[0].produto.nome}</div>
-                    </div>
-                `).join('');
+            const total = subtotal + taxa;
+
+            document.getElementById('subtotal').textContent = `R$ ${subtotal.toFixed(2)}`;
+            document.getElementById('taxa').textContent = `R$ ${taxa.toFixed(2)}`;
+            document.getElementById('totalCarrinho').textContent = `R$ ${total.toFixed(2)}`;
+        }
+
+        // REMOVER DO CARRINHO
+        function removerDoCarrinho(idx) {
+            app.vendas.itens.splice(idx, 1);
+            atualizarCarrinho();
+        }
+
+        // FINALIZAR VENDA
+        function finalizarVenda() {
+            if (app.vendas.itens.length === 0) {
+                alert('Adicione produtos ao carrinho');
+                return;
             }
+            if (!app.vendas.cliente) {
+                alert('Informe o nome do cliente');
+                return;
+            }
+            abrirModal('modalPagamento');
         }
 
-        function renderizarRelatorios() {
-            // Implementar gráficos e relatórios
-        }
+        // PROCESSAR PAGAMENTO
+        function processarPagamento(metodo) {
+            fecharModal('modalPagamento');
+            app.vendas.metodo = metodo;
 
-        function renderizarConfiguracoes() {
-            document.getElementById('taxa-debito').value = db.configuracoes.taxaDebito;
-            document.getElementById('taxa-credito').value = db.configuracoes.taxaCredito;
+            const subtotal = app.vendas.itens.reduce((sum, item) => {
+                let preco = item.preco;
+                if (item.adicionais) {
+                    item.adicionais.forEach(adId => {
+                        const ad = dados.adicionais.find(a => a.id === adId);
+                        if (ad) preco += ad.preco;
+                    });
+                }
+                return sum + preco;
+            }, 0);
 
-            const adicionaisList = document.getElementById('adicionais-list');
-            adicionaisList.innerHTML = db.adicionais.map(a => `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.8rem; background: #1a2f4f; border-radius: 4px; margin-bottom: 0.5rem;">
-                    <span>${a.nome} - R$ ${a.preco.toFixed(2)}</span>
-                    <button class="btn-delete" onclick="deletarAdicional(${a.id})">🗑️</button>
-                </div>
-            `).join('');
-        }
+            let taxa = 0;
+            if (metodo === 'Débito') {
+                taxa = subtotal * (app.config.taxaDebito / 100);
+            } else if (metodo === 'Crédito') {
+                taxa = subtotal * (app.config.taxaCredito / 100);
+            }
 
-        function salvarConfiguracoes() {
-            db.configuracoes.taxaDebito = parseFloat(document.getElementById('taxa-debito').value);
-            db.configuracoes.taxaCredito = parseFloat(document.getElementById('taxa-credito').value);
+            const total = subtotal + taxa;
+
+            const venda = {
+                id: dados.vendas.length + 1,
+                numero: dados.pedidos.length + 1,
+                cliente: app.vendas.cliente,
+                whatsapp: app.vendas.whatsapp,
+                tipoPedido: app.vendas.tipoPedido,
+                origem: app.vendas.origem,
+                itens: [...app.vendas.itens],
+                subtotal: subtotal,
+                taxa: taxa,
+                total: total,
+                metodo: metodo,
+                data: new Date().toLocaleDateString('pt-BR'),
+                hora: new Date().toLocaleTimeString('pt-BR'),
+                status: 'pendente'
+            };
+
+            dados.vendas.push(venda);
+
+            const pedido = {
+                id: venda.numero,
+                numero: venda.numero,
+                cliente: venda.cliente,
+                whatsapp: venda.whatsapp,
+                tipoPedido: venda.tipoPedido,
+                itens: venda.itens,
+                status: 'pendente',
+                dataHora: new Date(),
+                tempoInicio: new Date()
+            };
+
+            dados.pedidos.push(pedido);
+
+            document.getElementById('numeroPedidoSucesso').textContent = `#${venda.numero}`;
+            document.getElementById('totalSucesso').textContent = `R$ ${total.toFixed(2)}`;
+
+            abrirModal('modalSucesso');
+
+            app.vendas = {
+                cliente: '',
+                whatsapp: '',
+                tipoPedido: 'Local',
+                origem: 'Venda Local',
+                itens: [],
+                metodo: ''
+            };
+
             salvarDados();
-            alert('Configurações salvas!');
         }
 
-        function adicionarAdicional() {
-            const nome = document.getElementById('novo-adicional-nome').value;
-            const preco = parseFloat(document.getElementById('novo-adicional-preco').value);
+        // SALVAR PRODUTO
+        function salvarProduto() {
+            const nome = document.getElementById('produtoNome').value;
+            const preco = parseFloat(document.getElementById('produtoPreco').value);
+            const custo = parseFloat(document.getElementById('produtoCusto').value);
 
-            if (!nome || isNaN(preco)) {
-                alert('Preencha todos os campos!');
+            if (!nome || !preco || !custo) {
+                alert('Preencha todos os campos');
                 return;
             }
 
-            db.adicionais.push({
-                id: Math.max(...db.adicionais.map(a => a.id), 0) + 1,
+            dados.produtos.push({
+                id: dados.produtos.length + 1,
+                nome: nome,
+                preco: preco,
+                custo: custo,
+                adicionais: []
+            });
+
+            document.getElementById('produtoNome').value = '';
+            document.getElementById('produtoPreco').value = '';
+            document.getElementById('produtoCusto').value = '';
+
+            fecharModal('modalProduto');
+            salvarDados();
+        }
+
+        // SALVAR INGREDIENTE
+        function salvarIngrediente() {
+            const nome = document.getElementById('ingredienteNome').value;
+            const qtd = parseFloat(document.getElementById('ingredienteQtd').value);
+            const unidade = document.getElementById('ingredienteUnidade').value;
+            const preco = parseFloat(document.getElementById('ingredientePreco').value);
+            const alerta = parseFloat(document.getElementById('ingredienteAlerta').value);
+
+            if (!nome || !qtd || !unidade || !preco) {
+                alert('Preencha todos os campos');
+                return;
+            }
+
+            dados.ingredientes.push({
+                id: dados.ingredientes.length + 1,
+                nome: nome,
+                quantidade: qtd,
+                unidade: unidade,
+                preco: preco,
+                alerta: alerta || qtd * 0.2
+            });
+
+            document.getElementById('ingredienteNome').value = '';
+            document.getElementById('ingredienteQtd').value = '';
+            document.getElementById('ingredienteUnidade').value = '';
+            document.getElementById('ingredientePreco').value = '';
+            document.getElementById('ingredienteAlerta').value = '';
+
+            fecharModal('modalIngrediente');
+            salvarDados();
+        }
+
+        // SALVAR DESPESA
+        function salvarDespesa() {
+            const desc = document.getElementById('despesaDesc').value;
+            const cat = document.getElementById('despesaCat').value;
+            const valor = parseFloat(document.getElementById('despesaValor').value);
+
+            if (!desc || !valor) {
+                alert('Preencha todos os campos');
+                return;
+            }
+
+            dados.despesas.push({
+                id: dados.despesas.length + 1,
+                descricao: desc,
+                categoria: cat,
+                valor: valor,
+                data: new Date().toLocaleDateString('pt-BR')
+            });
+
+            document.getElementById('despesaDesc').value = '';
+            document.getElementById('despesaValor').value = '';
+
+            fecharModal('modalDespesa');
+            salvarDados();
+        }
+
+        // SALVAR DESPERDÍCIO
+        function salvarDesperdicio() {
+            const ing = document.getElementById('desperdicioIngrediente').value;
+            const qtd = parseFloat(document.getElementById('desperdicioQtd').value);
+            const motivo = document.getElementById('desperdicioMotivo').value;
+
+            if (!ing || !qtd || !motivo) {
+                alert('Preencha todos os campos');
+                return;
+            }
+
+            dados.desperdicio.push({
+                id: dados.desperdicio.length + 1,
+                ingrediente: ing,
+                quantidade: qtd,
+                motivo: motivo,
+                data: new Date().toLocaleDateString('pt-BR')
+            });
+
+            document.getElementById('desperdicioIngrediente').value = '';
+            document.getElementById('desperdicioQtd').value = '';
+            document.getElementById('desperdicioMotivo').value = '';
+
+            fecharModal('modalDesperdicio');
+            salvarDados();
+        }
+
+        // SALVAR COMBO
+        function salvarCombo() {
+            const nome = document.getElementById('comboNome').value;
+            const preco = parseFloat(document.getElementById('comboPreco').value);
+
+            if (!nome || !preco) {
+                alert('Preencha todos os campos');
+                return;
+            }
+
+            dados.combos.push({
+                id: dados.combos.length + 1,
                 nome: nome,
                 preco: preco
             });
 
-            document.getElementById('novo-adicional-nome').value = '';
-            document.getElementById('novo-adicional-preco').value = '';
-            renderizarConfiguracoes();
+            document.getElementById('comboNome').value = '';
+            document.getElementById('comboPreco').value = '';
+
+            fecharModal('modalCombo');
             salvarDados();
         }
 
-        function deletarAdicional(id) {
-            db.adicionais = db.adicionais.filter(a => a.id !== id);
-            renderizarConfiguracoes();
+        // SALVAR CLIENTE
+        function salvarCliente() {
+            const nome = document.getElementById('clienteNome').value;
+            const whatsapp = document.getElementById('clienteWhatsapp').value;
+
+            if (!nome) {
+                alert('Informe o nome');
+                return;
+            }
+
+            dados.clientes.push({
+                id: dados.clientes.length + 1,
+                nome: nome,
+                whatsapp: whatsapp || ''
+            });
+
+            document.getElementById('clienteNome').value = '';
+            document.getElementById('clienteWhatsapp').value = '';
+
+            fecharModal('modalCliente');
             salvarDados();
         }
 
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-
-        function openProdutoModal() {
-            alert('Adicionar novo produto - em desenvolvimento');
-        }
-
-        function openEstoqueModal() {
-            alert('Adicionar novo ingrediente - em desenvolvimento');
-        }
-
-        function openDespesaModal() {
-            alert('Adicionar nova despesa - em desenvolvimento');
-        }
-
-        function openClienteModal() {
-            alert('Adicionar novo cliente - em desenvolvimento');
-        }
-
-        function openComboModal() {
-            alert('Adicionar novo combo - em desenvolvimento');
-        }
-
-        function openDesperdícioModal() {
-            alert('Registrar desperdício - em desenvolvimento');
-        }
-
-        function editarProduto(id) {
-            alert('Editar produto - em desenvolvimento');
-        }
-
-        function deletarProduto(id) {
-            db.produtos = db.produtos.filter(p => p.id !== id);
-            renderizarProdutos();
-            salvarDados();
-        }
-
-        function editarIngrediente(id) {
-            alert('Editar ingrediente - em desenvolvimento');
-        }
-
-        function deletarIngrediente(id) {
-            db.ingredientes = db.ingredientes.filter(i => i.id !== id);
-            renderizarEstoque();
-            salvarDados();
-        }
-
-        function editarDespesa(id) {
-            alert('Editar despesa - em desenvolvimento');
-        }
-
-        function deletarDespesa(id) {
-            db.despesas = db.despesas.filter(d => d.id !== id);
-            renderizarDespesas();
-            salvarDados();
-        }
-
-        function exportarPDF() {
-            alert('Exportar PDF - em desenvolvimento');
-        }
-
-        function exportarExcel() {
-            alert('Exportar Excel - em desenvolvimento');
-        }
-
-        function salvarDados() {
-            localStorage.setItem('foodTruckDB', JSON.stringify(db));
-        }
-
-        function carregarDados() {
-            const dados = localStorage.getItem('foodTruckDB');
-            if (dados) {
-                Object.assign(db, JSON.parse(dados));
+        // MARCAR PEDIDO COMO PRONTO
+        function marcarPronto(pedidoId) {
+            const pedido = dados.pedidos.find(p => p.numero === pedidoId);
+            if (pedido) {
+                pedido.status = 'pronto';
+                salvarDados();
             }
         }
 
-        // INICIALIZAÇÃO
-        window.addEventListener('load', () => {
-            carregarDados();
-            renderizarProdutos();
-            renderizarDashboard();
-            
-            // Atualizar cronômetro da cozinha
-            setInterval(() => {
-                db.pedidosCozinha.forEach(p => {
-                    if (p.status === 'pendente') p.tempo++;
+        // CANCELAR PEDIDO
+        function cancelarPedido(pedidoId) {
+            const pedido = dados.pedidos.find(p => p.numero === pedidoId);
+            if (pedido) {
+                pedido.status = 'cancelado';
+                // Remover da venda
+                dados.vendas = dados.vendas.filter(v => v.numero !== pedidoId);
+                salvarDados();
+            }
+        }
+
+        // ATUALIZAR UI
+        function atualizarUI() {
+            // DASHBOARD
+            const vendas = dados.vendas.filter(v => v.data === new Date().toLocaleDateString('pt-BR'));
+            const faturamento = vendas.reduce((sum, v) => sum + v.total, 0);
+            const custos = vendas.reduce((sum, v) => {
+                return sum + v.itens.reduce((itemSum, item) => itemSum + item.custo, 0);
+            }, 0);
+            const lucro = faturamento - custos;
+
+            document.getElementById('faturamento').textContent = `R$ ${faturamento.toFixed(2)}`;
+            document.getElementById('lucro').textContent = `R$ ${lucro.toFixed(2)}`;
+            document.getElementById('pedidosHoje').textContent = vendas.length;
+
+            // DASHBOARD - HISTÓRICO
+            let historicoHtml = '';
+            vendas.forEach(v => {
+                historicoHtml += `
+                    <tr>
+                        <td>#${v.numero}</td>
+                        <td>${v.cliente}</td>
+                        <td>${v.itens.map(i => i.nome).join(', ')}</td>
+                        <td>R$ ${v.total.toFixed(2)}</td>
+                        <td>${v.metodo}</td>
+                        <td>${v.hora}</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('dashboardHistorico').innerHTML = historicoHtml || '<tr><td colspan="6" style="text-align: center; color: #94a3b8;">Nenhuma venda realizada</td></tr>';
+
+            // DASHBOARD - PARA ENTREGA
+            const prontos = dados.pedidos.filter(p => p.status === 'pronto');
+            let entregaHtml = '';
+            prontos.forEach(p => {
+                entregaHtml += `
+                    <div class="card" style="border-left: 5px solid #22c55e;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #f97316;">#${p.numero}</div>
+                            <span class="badge badge-green">PRONTO</span>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="color: #94a3b8; font-size: 0.875rem;">Cliente:</div>
+                            <div style="font-weight: bold;">${p.cliente}</div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="color: #94a3b8; font-size: 0.875rem;">Produtos:</div>
+                            <div>${p.itens.map(i => i.nome).join(', ')}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('dashboardEntrega').innerHTML = entregaHtml || '<p style="color: #94a3b8;">Nenhum pedido pronto para entrega</p>';
+
+            // PRODUTOS
+            let produtosHtml = '';
+            dados.produtos.forEach(p => {
+                const lucro = p.preco - p.custo;
+                produtosHtml += `
+                    <tr>
+                        <td>${p.nome}</td>
+                        <td>R$ ${p.preco.toFixed(2)}</td>
+                        <td>R$ ${p.custo.toFixed(2)}</td>
+                        <td style="color: #22c55e;">R$ ${lucro.toFixed(2)}</td>
+                        <td>
+                            <button class="btn btn-danger" onclick="deletarProduto(${p.id})" style="padding: 0.25rem 0.75rem;">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            document.getElementById('tabelaProdutos').innerHTML = produtosHtml || '<tr><td colspan="5" style="text-align: center; color: #94a3b8;">Nenhum produto cadastrado</td></tr>';
+
+            // ESTOQUE
+            let estoqueHtml = '';
+            dados.ingredientes.forEach(i => {
+                const total = i.quantidade * i.preco;
+                const alerta = i.quantidade < i.alerta ? '<span class="badge badge-red">BAIXO</span>' : '';
+                estoqueHtml += `
+                    <tr>
+                        <td>${i.nome}</td>
+                        <td>${i.quantidade} ${i.unidade}</td>
+                        <td>R$ ${i.preco.toFixed(2)}</td>
+                        <td>R$ ${total.toFixed(2)}</td>
+                        <td>${alerta}</td>
+                        <td>
+                            <button class="btn btn-danger" onclick="deletarIngrediente(${i.id})" style="padding: 0.25rem 0.75rem;">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            document.getElementById('tabelaEstoque').innerHTML = estoqueHtml || '<tr><td colspan="6" style="text-align: center; color: #94a3b8;">Nenhum ingrediente cadastrado</td></tr>';
+
+            // DESPESAS
+            let despesasHtml = '';
+            dados.despesas.forEach(d => {
+                despesasHtml += `
+                    <tr>
+                        <td>${d.descricao}</td>
+                        <td><span class="badge badge-orange">${d.categoria}</span></td>
+                        <td>R$ ${d.valor.toFixed(2)}</td>
+                        <td>${d.data}</td>
+                        <td>
+                            <button class="btn btn-danger" onclick="deletarDespesa(${d.id})" style="padding: 0.25rem 0.75rem;">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            document.getElementById('tabelaDespesas').innerHTML = despesasHtml || '<tr><td colspan="5" style="text-align: center; color: #94a3b8;">Nenhuma despesa registrada</td></tr>';
+
+            // CLIENTES
+            let clientesHtml = '';
+            dados.clientes.forEach(c => {
+                const compras = dados.vendas.filter(v => v.cliente === c.nome).length;
+                const total = dados.vendas.filter(v => v.cliente === c.nome).reduce((sum, v) => sum + v.total, 0);
+                clientesHtml += `
+                    <tr>
+                        <td>${c.nome}</td>
+                        <td>${c.whatsapp || '-'}</td>
+                        <td>${compras}</td>
+                        <td>R$ ${total.toFixed(2)}</td>
+                        <td>
+                            <button class="btn btn-danger" onclick="deletarCliente(${c.id})" style="padding: 0.25rem 0.75rem;">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            document.getElementById('tabelaClientes').innerHTML = clientesHtml || '<tr><td colspan="5" style="text-align: center; color: #94a3b8;">Nenhum cliente cadastrado</td></tr>';
+
+            // COMBOS
+            let combosHtml = '';
+            dados.combos.forEach(c => {
+                combosHtml += `
+                    <tr>
+                        <td>${c.nome}</td>
+                        <td>-</td>
+                        <td>R$ ${c.preco.toFixed(2)}</td>
+                        <td>
+                            <button class="btn btn-danger" onclick="deletarCombo(${c.id})" style="padding: 0.25rem 0.75rem;">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            document.getElementById('tabelaCombos').innerHTML = combosHtml || '<tr><td colspan="4" style="text-align: center; color: #94a3b8;">Nenhum combo cadastrado</td></tr>';
+
+            // PRODUTOS NA TELA DE VENDAS
+            let produtosVendas = '';
+            dados.produtos.forEach(p => {
+                produtosVendas += `
+                    <div class="card product-card" onclick="adicionarAoCarrinho(${p.id})">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🍔</div>
+                        <div style="font-weight: bold; margin-bottom: 0.5rem;">${p.nome}</div>
+                        <div style="color: #f97316; font-weight: bold;">R$ ${p.preco.toFixed(2)}</div>
+                        <div style="color: #94a3b8; font-size: 0.875rem;">Lucro R$ ${(p.preco - p.custo).toFixed(2)}</div>
+                    </div>
+                `;
+            });
+            document.getElementById('gridProdutos').innerHTML = produtosVendas;
+
+            // COZINHA
+            const pendentes = dados.pedidos.filter(p => p.status === 'pendente');
+            document.getElementById('contadorPendentes').textContent = pendentes.length;
+
+            let cozinhaHtml = '';
+            pendentes.forEach(p => {
+                const tempo = new Date() - p.tempoInicio;
+                const minutos = Math.floor(tempo / 60000);
+                const segundos = Math.floor((tempo % 60000) / 1000);
+                const timerClass = minutos > 5 ? 'danger' : minutos > 3 ? 'warning' : '';
+
+                let itensHtml = '';
+                p.itens.forEach(item => {
+                    let adicionaisHtml = '';
+                    if (item.adicionais && item.adicionais.length > 0) {
+                        item.adicionais.forEach(adId => {
+                            const ad = dados.adicionais.find(a => a.id === adId);
+                            if (ad) adicionaisHtml += `<span class="additional-tag">${ad.nome}</span>`;
+                        });
+                    }
+                    itensHtml += `
+                        <div style="background: #0f172a; padding: 0.75rem; border-radius: 0.25rem; margin-bottom: 0.5rem;">
+                            <div style="font-weight: bold; margin-bottom: 0.25rem;">${item.nome}</div>
+                            <div style="color: #94a3b8; font-size: 0.875rem;">${adicionaisHtml}</div>
+                        </div>
+                    `;
                 });
-                if (document.getElementById('cozinha').classList.contains('active')) {
-                    renderizarCozinha();
-                }
+
+                cozinhaHtml += `
+                    <div class="card product-card pending" style="border-left: 5px solid #f97316;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <div>
+                                <div style="font-size: 1.5rem; font-weight: bold; color: #f97316;">#${p.numero}</div>
+                                <div style="color: #94a3b8; font-size: 0.875rem;">${p.cliente}</div>
+                            </div>
+                            <span class="badge badge-orange">${p.tipoPedido}</span>
+                        </div>
+                        <div class="timer ${timerClass}" style="margin-bottom: 1rem;">⏱️ ${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}</div>
+                        <div style="margin-bottom: 1rem;">
+                            ${itensHtml}
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-success" onclick="marcarPronto(${p.numero})" style="flex: 1;">✓ PRONTO</button>
+                            <button class="btn btn-danger" onclick="cancelarPedido(${p.numero})" style="flex: 1;">🗑️ Cancelar</button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('gridCozinha').innerHTML = cozinhaHtml || '<p style="color: #94a3b8;">Nenhum pedido pendente</p>';
+
+            // HISTÓRICO DE VENDAS
+            let historicoVendasHtml = '';
+            dados.vendas.forEach(v => {
+                historicoVendasHtml += `
+                    <tr>
+                        <td>#${v.numero}</td>
+                        <td>${v.cliente}</td>
+                        <td>${v.itens.map(i => i.nome).join(', ')}</td>
+                        <td>R$ ${v.total.toFixed(2)}</td>
+                        <td>${v.metodo}</td>
+                        <td><span class="badge badge-green">Concluído</span></td>
+                        <td>${v.hora}</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('tabelaHistoricoVendas').innerHTML = historicoVendasHtml || '<tr><td colspan="7" style="text-align: center; color: #94a3b8;">Nenhuma venda realizada</td></tr>';
+
+            // RELATÓRIOS
+            const totalFaturamento = dados.vendas.reduce((sum, v) => sum + v.total, 0);
+            const totalCusto = dados.vendas.reduce((sum, v) => {
+                return sum + v.itens.reduce((itemSum, item) => itemSum + item.custo, 0);
+            }, 0);
+            const lucroTotal = totalFaturamento - totalCusto;
+
+            document.getElementById('relFaturamento').textContent = `R$ ${totalFaturamento.toFixed(2)}`;
+            document.getElementById('relCMV').textContent = `R$ ${totalCusto.toFixed(2)}`;
+            document.getElementById('relLucroBruto').textContent = `R$ ${lucroTotal.toFixed(2)}`;
+
+            let relatorioHtml = '';
+            dados.vendas.forEach(v => {
+                const custoPedido = v.itens.reduce((sum, item) => sum + item.custo, 0);
+                const lucroPedido = v.total - custoPedido;
+                relatorioHtml += `
+                    <tr>
+                        <td>#${v.numero}</td>
+                        <td>${v.cliente}</td>
+                        <td>${v.itens.map(i => i.nome).join(', ')}</td>
+                        <td>R$ ${v.total.toFixed(2)}</td>
+                        <td>R$ ${custoPedido.toFixed(2)}</td>
+                        <td style="color: #22c55e;">R$ ${lucroPedido.toFixed(2)}</td>
+                        <td>${v.metodo}</td>
+                        <td>${v.data}</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('tabelaRelatorios').innerHTML = relatorioHtml || '<tr><td colspan="8" style="text-align: center; color: #94a3b8;">Nenhuma venda</td></tr>';
+
+            // ATUALIZAR CRONÔMETRO
+            setInterval(() => {
+                const pendentes = dados.pedidos.filter(p => p.status === 'pendente');
+                pendentes.forEach((p, idx) => {
+                    const tempo = new Date() - p.tempoInicio;
+                    const minutos = Math.floor(tempo / 60000);
+                    const segundos = Math.floor((tempo % 60000) / 1000);
+                    const timers = document.querySelectorAll('.timer');
+                    if (timers[idx]) {
+                        timers[idx].textContent = `⏱️ ${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+                        timers[idx].className = 'timer ' + (minutos > 5 ? 'danger' : minutos > 3 ? 'warning' : '');
+                    }
+                });
             }, 1000);
-        });
+        }
+
+        // DELETAR FUNÇÕES
+        function deletarProduto(id) {
+            dados.produtos = dados.produtos.filter(p => p.id !== id);
+            salvarDados();
+        }
+
+        function deletarIngrediente(id) {
+            dados.ingredientes = dados.ingredientes.filter(i => i.id !== id);
+            salvarDados();
+        }
+
+        function deletarDespesa(id) {
+            dados.despesas = dados.despesas.filter(d => d.id !== id);
+            salvarDados();
+        }
+
+        function deletarCliente(id) {
+            dados.clientes = dados.clientes.filter(c => c.id !== id);
+            salvarDados();
+        }
+
+        function deletarCombo(id) {
+            dados.combos = dados.combos.filter(c => c.id !== id);
+            salvarDados();
+        }
+
+        // EXPORTAR PDF
+        function exportarPDF() {
+            const element = document.getElementById('tabelaRelatorios');
+            const opt = {
+                margin: 10,
+                filename: 'relatorio-food-truck.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // EXPORTAR EXCEL
+        function exportarExcel() {
+            let csv = 'Número,Cliente,Produtos,Total,Custo,Lucro,Método,Data\n';
+            dados.vendas.forEach(v => {
+                const custoPedido = v.itens.reduce((sum, item) => sum + item.custo, 0);
+                const lucroPedido = v.total - custoPedido;
+                csv += `#${v.numero},"${v.cliente}","${v.itens.map(i => i.nome).join(', ')}",${v.total.toFixed(2)},${custoPedido.toFixed(2)},${lucroPedido.toFixed(2)},"${v.metodo}",${v.data}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'relatorio-food-truck.csv';
+            a.click();
+        }
+
+        // INICIALIZAR
+        carregarDados();
     </script>
 </body>
 </html>
