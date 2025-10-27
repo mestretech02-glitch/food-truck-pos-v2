@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Truck Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        .header {
+            background: #16213e;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #ff6b35;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            color: #ff6b35;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: #16213e;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .tab-btn.active {
+            background: #ff6b35;
+            color: #fff;
+        }
+
+        .tab-btn:hover {
+            background: #ff6b35;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #ff6b35;
+        }
+
+        .section h2 {
+            color: #ff6b35;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .product-card {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .product-card:hover {
+            border-color: #ff6b35;
+            transform: scale(1.05);
+        }
+
+        .product-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .product-price {
+            color: #ff6b35;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .product-lucro {
+            color: #4caf50;
+            font-size: 0.8em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ff6b35;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: #0f3460;
+            border: 1px solid #ff6b35;
+            color: #fff;
+            border-radius: 5px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .button-group button {
+            padding: 12px;
+            background: #ff6b35;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .button-group button:hover {
+            background: #ff5722;
+            transform: translateY(-2px);
+        }
+
+        .button-group button.secondary {
+            background: #0f3460;
+            border: 2px solid #ff6b35;
+            color: #ff6b35;
+        }
+
+        .button-group button.secondary:hover {
+            background: #ff6b35;
+            color: #fff;
+        }
+
+        .cart-item {
+            background: #0f3460;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #ff6b35;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .cart-item-qty {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .cart-item-price {
+            color: #ff6b35;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .cart-item-remove {
+            background: #ff6b35;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .cart-item-remove:hover {
+            background: #ff5722;
+        }
+
+        .cart-total {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-align: right;
+            border-top: 2px solid #ff6b35;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .cart-total-value {
+            color: #4caf50;
+            font-size: 1.5em;
+        }
+
+        .finalize-btn {
+            width: 100%;
+            padding: 15px;
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s;
+        }
+
+        .finalize-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .finalize-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .success-message {
+            background: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #ff6b35;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            color: #ff6b35;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #0f3460;
+            padding: 12px;
+            text-align: left;
+            color: #ff6b35;
+            font-weight: bold;
+            border-bottom: 2px solid #ff6b35;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #0f3460;
+        }
+
+        tr:hover {
+            background: #0f3460;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            background: #ff6b35;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .btn-small:hover {
+            background: #ff5722;
+        }
+
+        .btn-small.danger {
+            background: #f44336;
+        }
+
+        .btn-small.danger:hover {
+            background: #da190b;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🍔 Food Truck Manager</h1>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('vendas')">Vendas</button>
+            <button class="tab-btn" onclick="switchTab('cozinha')">👨‍🍳 Cozinha</button>
+            <button class="tab-btn" onclick="switchTab('clientes')">👥 Clientes</button>
+            <button class="tab-btn" onclick="switchTab('produtos')">🍽️ Produtos</button>
+            <button class="tab-btn" onclick="switchTab('combos')">🎁 Combos</button>
+            <button class="tab-btn" onclick="switchTab('estoque')">📦 Estoque</button>
+            <button class="tab-btn" onclick="switchTab('despesas')">💰 Despesas</button>
+            <button class="tab-btn" onclick="switchTab('perdicio')">🗑️ Perdício</button>
+            <button class="tab-btn" onclick="switchTab('relatorios')">📈 Relatórios</button>
+            <button class="tab-btn" onclick="switchTab('config')">⚙️ Configurações</button>
+        </div>
+    </div>
+
+    <div id="success-message" class="success-message"></div>
+
+    <!-- TAB VENDAS -->
+    <div id="vendas" class="tab-content active">
+        <div class="container">
+            <!-- PRODUTOS -->
+            <div class="section">
+                <h2>Produtos Disponíveis</h2>
+                <div class="products-grid" id="products-list">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📦</div>
+                        <p>Nenhum produto cadastrado</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARRINHO -->
+            <div class="section">
+                <h2>🛒 Carrinho de Compras</h2>
+
+                <div class="form-group">
+                    <label>Tipo de Pedido</label>
+                    <div class="button-group">
+                        <button class="secondary" onclick="setPedidoType('viagem')">Para Viagem</button>
+                        <button class="secondary" onclick="setPedidoType('local')">Local</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Origem</label>
+                    <div class="button-group">
+                        <button class="secondary" onclick="setOrigem('local')">Venda Local</button>
+                        <button class="secondary" onclick="setOrigem('ifood')">iFoods</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Nome do Cliente</label>
+                    <input type="text" id="customer-name" placeholder="Buscar ou Adicionar Cliente">
+                </div>
+
+                <div class="form-group">
+                    <label>WhatsApp (Opcional)</label>
+                    <input type="text" id="customer-whatsapp" placeholder="Número do WhatsApp">
+                </div>
+
+                <div id="cart-items" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
+                    <div class="empty-state">
+                        <p>Selecione produtos para adicionar ao carrinho.</p>
+                    </div>
+                </div>
+
+                <div class="cart-total">
+                    Total: <span class="cart-total-value" id="cart-total">R$ 0,00</span>
+                </div>
+
+                <button class="finalize-btn" onclick="finalizeSale()">✓ Finalizar Venda</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB COZINHA -->
+    <div id="cozinha" class="tab-content">
+        <div class="section" style="max-width: 1400px; margin: 20px auto;">
+            <h2>👨‍🍳 Pedidos Pendentes</h2>
+            <div id="kitchen-orders">
+                <div class="empty-state">
+                    <div class="empty-state-icon">👨‍🍳</div>
+                    <p>Nenhum pedido pendente</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB CLIENTES -->
+    <div id="clientes" class="tab-content">
+        <div class="section" style="max-width: 1400px; margin: 20px auto;">
+            <h2>👥 Clientes</h2>
+            <button class="btn-small" onclick="openCustomerModal()">+ Novo Cliente</button>
+            <div class="table-container" style="margin-top: 20px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Telefone</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customers-table">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #999;">Nenhum cliente cadastrado</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB PRODUTOS -->
+    <div id="produtos" class="tab-content">
+        <div class="section" style="max-width: 1400px; margin: 20px auto;">
+            <h2>🍽️ Produtos</h2>
+            <button class="btn-small" onclick="openProductModal()">+ Novo Produto</button>
+            <div class="table-container" style="margin-top: 20px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Descrição</th>
+                            <th>Preço</th>
+                            <th>Categoria</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #999;">Nenhum produto cadastrado</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB ESTOQUE -->
+    <div id="estoque" class="tab-content">
+        <div class="section" style="max-width: 1400px; margin: 20px auto;">
+            <h2>📦 Estoque</h2>
+            <button class="btn-small" onclick="openInventoryModal()">+ Novo Ingrediente</button>
+            <div class="table-container" style="margin-top: 20px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Quantidade</th>
+                            <th>Unidade</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-table">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #999;">Nenhum ingrediente cadastrado</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB DESPESAS -->
+    <div id="despesas" class="tab-content">
+        <div class="section" style="max-width: 1400px; margin: 20px auto;">
+            <h2>💰 Despesas</h2>
+            <button class="btn-small" onclick="openExpenseModal()">+ Nova Despesa</button>
+            <div class="table-container" style="margin-top: 20px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Descrição</th>
+                            <th>Valor</th>
+                            <th>Data</th>
+                            <th>Categoria</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenses-table">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #999;">Nenhuma despesa cadastrada</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB RELATÓRIOS -->
+    <div id="relatorios" class="tab-content">
+        <div class="section" style="max-width: 1400px; margin: 20px auto;">
+            <h2>📈 Relatórios</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-sales">R$ 0,00</div>
+                    <div class="stat-label">Total de Vendas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-orders">0</div>
+                    <div class="stat-label">Pedidos Hoje</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-customers">0</div>
+                    <div class="stat-label">Clientes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-expenses">R$ 0,00</div>
+                    <div class="stat-label">Despesas</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB CONFIGURAÇÕES -->
+    <div id="config" class="tab-content">
+        <div class="section" style="max-width: 1400px; margin: 20px auto;">
+            <h2>⚙️ Configurações</h2>
+            <div class="form-group">
+                <label>Nome da Loja</label>
+                <input type="text" id="store-name" placeholder="Nome da sua loja">
+            </div>
+            <div class="form-group">
+                <label>Telefone</label>
+                <input type="text" id="store-phone" placeholder="Telefone">
+            </div>
+            <button class="btn-small" onclick="saveSettings()">Salvar Configurações</button>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = "https://xnsjlnwfqnrwxzqfhgqz.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhuc2psbnpmcW5yd3h6cWZoZ3F6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzczMjQ2NTQsImV4cCI6MjA1MjkwMDY1NH0.uP-fgzDPjQwVhVMSjzDjTYAV1GpnXvCqZO3Hy_HBvzc";
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let products = [];
+        let cart = [];
+        let customers = [];
+        let orders = [];
+        let ingredients = [];
+        let expenses = [];
+        let pedidoType = 'viagem';
+        let origem = 'local';
+
+        // Initialize
+        async function init() {
+            await loadProducts();
+            await loadCustomers();
+            await loadOrders();
+            await loadIngredients();
+            await loadExpenses();
+            updateDashboard();
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Products
+        async function loadProducts() {
+            try {
+                const { data, error } = await supabase.from('products').select('*');
+                if (error) throw error;
+                products = data || [];
+                renderProducts();
+            } catch (error) {
+                console.error('Erro ao carregar produtos:', error);
+            }
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('products-list');
+            if (products.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📦</div><p>Nenhum produto cadastrado</p></div>';
+                return;
+            }
+
+            container.innerHTML = products.map(product => `
+                <div class="product-card" onclick="addToCart(${product.id}, '${product.name}', ${product.price})">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-price">R$ ${parseFloat(product.price).toFixed(2)}</div>
+                    <div class="product-lucro">Lucro: R$ ${parseFloat(product.price * 0.3).toFixed(2)}</div>
+                </div>
+            `).join('');
+        }
+
+        async function saveProduct() {
+            const name = document.getElementById('product-name').value;
+            const price = document.getElementById('product-price').value;
+            const description = document.getElementById('product-description').value;
+            const category = document.getElementById('product-category').value;
+
+            if (!name || !price) {
+                alert('Preencha os campos obrigatórios');
+                return;
+            }
+
+            try {
+                const { error } = await supabase.from('products').insert([{
+                    name,
+                    price: parseFloat(price),
+                    description,
+                    category
+                }]);
+
+                if (error) throw error;
+                await loadProducts();
+                showSuccess('Produto salvo!');
+                closeModal('productModal');
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('Deletar este produto?')) return;
+            try {
+                const { error } = await supabase.from('products').delete().eq('id', id);
+                if (error) throw error;
+                await loadProducts();
+                showSuccess('Produto deletado!');
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        // Cart
+        function addToCart(id, name, price) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.quantity++;
+            } else {
+                cart.push({ id, name, price, quantity: 1 });
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            const totalElement = document.getElementById('cart-total');
+
+            if (cart.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>Selecione produtos para adicionar ao carrinho.</p></div>';
+                totalElement.textContent = 'R$ 0,00';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                return `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-qty">Qtd: <strong>${item.quantity}</strong></div>
+                        </div>
+                        <div class="cart-item-price">R$ ${itemTotal.toFixed(2)}</div>
+                        <button class="cart-item-remove" onclick="removeFromCart(${item.id})">✕</button>
+                    </div>
+                `;
+            }).join('');
+
+            totalElement.textContent = `R$ ${total.toFixed(2)}`;
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            renderCart();
+        }
+
+        function setPedidoType(type) {
+            pedidoType = type;
+        }
+
+        function setOrigem(orig) {
+            origem = orig;
+        }
+
+        // Sales
+        async function finalizeSale() {
+            const customerName = document.getElementById('customer-name').value;
+            if (!customerName) {
+                alert('Digite o nome do cliente');
+                return;
+            }
+
+            if (cart.length === 0) {
+                alert('Carrinho vazio');
+                return;
+            }
+
+            try {
+                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+                const { error } = await supabase.from('sales').insert([{
+                    customer_name: customerName,
+                    customer_whatsapp: document.getElementById('customer-whatsapp').value,
+                    items: JSON.stringify(cart),
+                    total: total,
+                    pedido_type: pedidoType,
+                    origem: origem,
+                    status: 'pending'
+                }]);
+
+                if (error) throw error;
+
+                cart = [];
+                document.getElementById('customer-name').value = '';
+                document.getElementById('customer-whatsapp').value = '';
+                renderCart();
+                showSuccess('Venda finalizada!');
+                await loadOrders();
+                updateDashboard();
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        // Customers
+        async function loadCustomers() {
+            try {
+                const { data, error } = await supabase.from('customers').select('*');
+                if (error) throw error;
+                customers = data || [];
+                renderCustomers();
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+
+        function renderCustomers() {
+            const table = document.getElementById('customers-table');
+            if (customers.length === 0) {
+                table.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">Nenhum cliente cadastrado</td></tr>';
+                return;
+            }
+
+            table.innerHTML = customers.map(customer => `
+                <tr>
+                    <td>${customer.name}</td>
+                    <td>${customer.email || '-'}</td>
+                    <td>${customer.phone || '-'}</td>
+                    <td>
+                        <button class="btn-small danger" onclick="deleteCustomer(${customer.id})">Deletar</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function saveCustomer() {
+            const name = document.getElementById('customer-name-input').value;
+            const email = document.getElementById('customer-email').value;
+            const phone = document.getElementById('customer-phone').value;
+
+            if (!name) {
+                alert('Preencha o nome');
+                return;
+            }
+
+            try {
+                const { error } = await supabase.from('customers').insert([{ name, email, phone }]);
+                if (error) throw error;
+                await loadCustomers();
+                showSuccess('Cliente salvo!');
+                closeModal('customerModal');
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        async function deleteCustomer(id) {
+            if (!confirm('Deletar?')) return;
+            try {
+                const { error } = await supabase.from('customers').delete().eq('id', id);
+                if (error) throw error;
+                await loadCustomers();
+                showSuccess('Cliente deletado!');
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        // Orders
+        async function loadOrders() {
+            try {
+                const { data, error } = await supabase.from('sales').select('*').order('created_at', { ascending: false });
+                if (error) throw error;
+                orders = data || [];
+                renderKitchen();
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+
+        function renderKitchen() {
+            const container = document.getElementById('kitchen-orders');
+            const pending = orders.filter(o => o.status === 'pending');
+
+            if (pending.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👨‍🍳</div><p>Nenhum pedido pendente</p></div>';
+                return;
+            }
+
+            container.innerHTML = pending.map(order => `
+                <div class="section" style="margin-bottom: 20px;">
+                    <h3>Pedido #${order.id}</h3>
+                    <p><strong>Cliente:</strong> ${order.customer_name}</p>
+                    <p><strong>Itens:</strong> ${JSON.parse(order.items).map(i => `${i.name} (${i.quantity})`).join(', ')}</p>
+                    <p><strong>Total:</strong> R$ ${parseFloat(order.total).toFixed(2)}</p>
+                    <div class="button-group">
+                        <button onclick="completeOrder(${order.id})">✓ Pronto</button>
+                        <button class="secondary" onclick="cancelOrder(${order.id})">✕ Cancelar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function completeOrder(id) {
+            try {
+                const { error } = await supabase.from('sales').update({ status: 'completed' }).eq('id', id);
+                if (error) throw error;
+                await loadOrders();
+                showSuccess('Pedido pronto!');
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        async function cancelOrder(id) {
+            if (!confirm('Cancelar pedido?')) return;
+            try {
+                const { error } = await supabase.from('sales').delete().eq('id', id);
+                if (error) throw error;
+                await loadOrders();
+                showSuccess('Pedido cancelado!');
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        // Inventory
+        async function loadIngredients() {
+            try {
+                const { data, error } = await supabase.from('ingredients').select('*');
+                if (error) throw error;
+                ingredients = data || [];
+                renderInventory();
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+
+        function renderInventory() {
+            const table = document.getElementById('inventory-table');
+            if (ingredients.length === 0) {
+                table.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">Nenhum ingrediente cadastrado</td></tr>';
+                return;
+            }
+
+            table.innerHTML = ingredients.map(item => `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.unit}</td>
+                    <td>
+                        <button class="btn-small danger" onclick="deleteIngredient(${item.id})">Deletar</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function saveIngredient() {
+            const name = document.getElementById('ingredient-name').value;
+            const quantity = document.getElementById('ingredient-quantity').value;
+            const unit = document.getElementById('ingredient-unit').value;
+
+            if (!name || !quantity || !unit) {
+                alert('Preencha todos os campos');
+                return;
+            }
+
+            try {
+                const { error } = await supabase.from('ingredients').insert([{
+                    name,
+                    quantity: parseFloat(quantity),
+                    unit
+                }]);
+
+                if (error) throw error;
+                await loadIngredients();
+                showSuccess('Ingrediente salvo!');
+                closeModal('inventoryModal');
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        async function deleteIngredient(id) {
+            if (!confirm('Deletar?')) return;
+            try {
+                const { error } = await supabase.from('ingredients').delete().eq('id', id);
+                if (error) throw error;
+                await loadIngredients();
+                showSuccess('Ingrediente deletado!');
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        // Expenses
+        async function loadExpenses() {
+            try {
+                const { data, error } = await supabase.from('expenses').select('*');
+                if (error) throw error;
+                expenses = data || [];
+                renderExpenses();
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+
+        function renderExpenses() {
+            const table = document.getElementById('expenses-table');
+            if (expenses.length === 0) {
+                table.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">Nenhuma despesa cadastrada</td></tr>';
+                return;
+            }
+
+            table.innerHTML = expenses.map(expense => `
+                <tr>
+                    <td>${expense.description}</td>
+                    <td>R$ ${parseFloat(expense.value).toFixed(2)}</td>
+                    <td>${new Date(expense.created_at).toLocaleDateString('pt-BR')}</td>
+                    <td>${expense.category}</td>
+                    <td>
+                        <button class="btn-small danger" onclick="deleteExpense(${expense.id})">Deletar</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function saveExpense() {
+            const description = document.getElementById('expense-description').value;
+            const value = document.getElementById('expense-value').value;
+            const category = document.getElementById('expense-category').value;
+
+            if (!description || !value || !category) {
+                alert('Preencha todos os campos');
+                return;
+            }
+
+            try {
+                const { error } = await supabase.from('expenses').insert([{
+                    description,
+                    value: parseFloat(value),
+                    category
+                }]);
+
+                if (error) throw error;
+                await loadExpenses();
+                showSuccess('Despesa salva!');
+                closeModal('expenseModal');
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        async function deleteExpense(id) {
+            if (!confirm('Deletar?')) return;
+            try {
+                const { error } = await supabase.from('expenses').delete().eq('id', id);
+                if (error) throw error;
+                await loadExpenses();
+                showSuccess('Despesa deletada!');
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        // Dashboard
+        async function updateDashboard() {
+            const totalSales = orders.filter(o => o.status === 'completed').reduce((sum, o) => sum + parseFloat(o.total), 0);
+            const totalOrders = orders.filter(o => o.status === 'completed').length;
+            const totalExpenses = expenses.reduce((sum, e) => sum + parseFloat(e.value), 0);
+
+            document.getElementById('total-sales').textContent = `R$ ${totalSales.toFixed(2)}`;
+            document.getElementById('total-orders').textContent = totalOrders;
+            document.getElementById('total-customers').textContent = customers.length;
+            document.getElementById('total-expenses').textContent = `R$ ${totalExpenses.toFixed(2)}`;
+        }
+
+        // Modals
+        function openProductModal() {
+            const modal = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div style="background: #16213e; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; border: 2px solid #ff6b35;">
+                        <h2 style="color: #ff6b35; margin-bottom: 20px;">Novo Produto</h2>
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input type="text" id="product-name" placeholder="Nome do produto">
+                        </div>
+                        <div class="form-group">
+                            <label>Preço</label>
+                            <input type="number" id="product-price" placeholder="Preço" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Descrição</label>
+                            <textarea id="product-description" placeholder="Descrição"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Categoria</label>
+                            <input type="text" id="product-category" placeholder="Categoria">
+                        </div>
+                        <div class="button-group">
+                            <button onclick="saveProduct()">Salvar</button>
+                            <button class="secondary" onclick="this.closest('[style*=position]').remove()">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modal);
+        }
+
+        function openCustomerModal() {
+            const modal = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div style="background: #16213e; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; border: 2px solid #ff6b35;">
+                        <h2 style="color: #ff6b35; margin-bottom: 20px;">Novo Cliente</h2>
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input type="text" id="customer-name-input" placeholder="Nome">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="customer-email" placeholder="Email">
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone</label>
+                            <input type="text" id="customer-phone" placeholder="Telefone">
+                        </div>
+                        <div class="button-group">
+                            <button onclick="saveCustomer()">Salvar</button>
+                            <button class="secondary" onclick="this.closest('[style*=position]').remove()">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modal);
+        }
+
+        function openInventoryModal() {
+            const modal = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div style="background: #16213e; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; border: 2px solid #ff6b35;">
+                        <h2 style="color: #ff6b35; margin-bottom: 20px;">Novo Ingrediente</h2>
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input type="text" id="ingredient-name" placeholder="Nome">
+                        </div>
+                        <div class="form-group">
+                            <label>Quantidade</label>
+                            <input type="number" id="ingredient-quantity" placeholder="Quantidade" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Unidade</label>
+                            <input type="text" id="ingredient-unit" placeholder="kg, L, un...">
+                        </div>
+                        <div class="button-group">
+                            <button onclick="saveIngredient()">Salvar</button>
+                            <button class="secondary" onclick="this.closest('[style*=position]').remove()">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modal);
+        }
+
+        function openExpenseModal() {
+            const modal = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div style="background: #16213e; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; border: 2px solid #ff6b35;">
+                        <h2 style="color: #ff6b35; margin-bottom: 20px;">Nova Despesa</h2>
+                        <div class="form-group">
+                            <label>Descrição</label>
+                            <input type="text" id="expense-description" placeholder="Descrição">
+                        </div>
+                        <div class="form-group">
+                            <label>Valor</label>
+                            <input type="number" id="expense-value" placeholder="Valor" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Categoria</label>
+                            <input type="text" id="expense-category" placeholder="Categoria">
+                        </div>
+                        <div class="button-group">
+                            <button onclick="saveExpense()">Salvar</button>
+                            <button class="secondary" onclick="this.closest('[style*=position]').remove()">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modal);
+        }
+
+        function saveSettings() {
+            alert('Configurações salvas!');
+        }
+
+        function showSuccess(message) {
+            const el = document.getElementById('success-message');
+            el.textContent = message;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        // Initialize on load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
