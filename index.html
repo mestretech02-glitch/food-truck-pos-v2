@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Truck Manager</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -15,111 +14,86 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a2e;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: #fff;
+            min-height: 100vh;
         }
 
         .header {
-            background: #16213e;
-            padding: 15px 30px;
+            background: linear-gradient(90deg, #ff6b35 0%, #f7931e 100%);
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 3px solid #ff6b35;
+            justify-content: space-between;
         }
 
         .header h1 {
-            font-size: 1.8em;
-            color: #ff6b35;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .tabs {
+        .nav-tabs {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
         }
 
-        .tab-btn {
-            padding: 10px 20px;
-            background: #16213e;
-            color: #fff;
+        .nav-tabs button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
             border: none;
-            cursor: pointer;
+            padding: 8px 16px;
             border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
             transition: all 0.3s;
-            font-weight: bold;
         }
 
-        .tab-btn.active {
+        .nav-tabs button.active {
             background: #ff6b35;
-            color: #fff;
+            color: white;
         }
 
-        .tab-btn:hover {
+        .nav-tabs button:hover {
             background: #ff6b35;
         }
 
         .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .two-column {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
-            padding: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .section {
-            background: #16213e;
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #ff6b35;
-        }
-
-        .section h2 {
-            color: #ff6b35;
             margin-bottom: 20px;
-            font-size: 1.5em;
         }
 
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-
-        .product-card {
+        .card {
             background: #0f3460;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
+            border: 2px solid #ff6b35;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
 
-        .product-card:hover {
-            border-color: #ff6b35;
-            transform: scale(1.05);
-        }
-
-        .product-name {
-            font-weight: bold;
-            margin-bottom: 10px;
-            font-size: 0.9em;
-        }
-
-        .product-price {
+        .card h2 {
             color: #ff6b35;
-            font-size: 1.3em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .product-lucro {
-            color: #4caf50;
-            font-size: 0.8em;
+            margin-bottom: 15px;
+            font-size: 20px;
         }
 
         .form-group {
@@ -128,74 +102,124 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
             color: #ff6b35;
+            margin-bottom: 5px;
             font-weight: bold;
         }
 
         .form-group input,
-        .form-group select,
-        .form-group textarea {
+        .form-group textarea,
+        .form-group select {
             width: 100%;
             padding: 10px;
-            background: #0f3460;
+            background: #1a1a2e;
             border: 1px solid #ff6b35;
-            color: #fff;
             border-radius: 5px;
+            color: white;
             font-family: inherit;
         }
 
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #fff;
-            box-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
         }
 
         .button-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
             gap: 10px;
-            margin-bottom: 15px;
+            margin-top: 20px;
         }
 
-        .button-group button {
+        button {
+            flex: 1;
             padding: 12px;
-            background: #ff6b35;
-            color: #fff;
             border: none;
             border-radius: 5px;
-            cursor: pointer;
+            font-size: 16px;
             font-weight: bold;
+            cursor: pointer;
             transition: all 0.3s;
         }
 
-        .button-group button:hover {
-            background: #ff5722;
+        .btn-primary {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #f7931e;
             transform: translateY(-2px);
         }
 
-        .button-group button.secondary {
+        .btn-secondary {
             background: #0f3460;
-            border: 2px solid #ff6b35;
             color: #ff6b35;
+            border: 2px solid #ff6b35;
         }
 
-        .button-group button.secondary:hover {
+        .btn-secondary:hover {
             background: #ff6b35;
-            color: #fff;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #d32f2f;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b71c1c;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .product-card {
+            background: #1a1a2e;
+            border: 2px solid #ff6b35;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .product-card:hover {
+            background: #ff6b35;
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        .product-card h3 {
+            color: #ff6b35;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .product-card .price {
+            color: #4caf50;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .product-card:hover h3,
+        .product-card:hover .price {
+            color: white;
         }
 
         .cart-item {
-            background: #0f3460;
+            background: #1a1a2e;
+            border-left: 4px solid #ff6b35;
             padding: 12px;
-            border-radius: 5px;
             margin-bottom: 10px;
+            border-radius: 5px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-left: 4px solid #ff6b35;
         }
 
         .cart-item-info {
@@ -203,201 +227,153 @@
         }
 
         .cart-item-name {
+            color: #ff6b35;
             font-weight: bold;
-            color: #fff;
-        }
-
-        .cart-item-qty {
-            color: #999;
-            font-size: 0.9em;
         }
 
         .cart-item-price {
-            color: #ff6b35;
-            font-weight: bold;
-            margin-right: 10px;
+            color: #4caf50;
         }
 
-        .cart-item-remove {
-            background: #ff6b35;
-            color: #fff;
-            border: none;
-            padding: 5px 10px;
+        .cart-item-controls {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .cart-item-controls input {
+            width: 50px;
+            padding: 5px;
+            background: #0f3460;
+            border: 1px solid #ff6b35;
             border-radius: 3px;
-            cursor: pointer;
-            font-weight: bold;
+            color: white;
+            text-align: center;
         }
 
-        .cart-item-remove:hover {
-            background: #ff5722;
+        .cart-item-controls button {
+            padding: 5px 10px;
+            font-size: 12px;
         }
 
         .cart-total {
             background: #0f3460;
+            border: 2px solid #4caf50;
             padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
+            border-radius: 8px;
             text-align: right;
-            border-top: 2px solid #ff6b35;
-            font-size: 1.3em;
-            font-weight: bold;
+            margin: 20px 0;
         }
 
-        .cart-total-value {
+        .cart-total h3 {
             color: #4caf50;
-            font-size: 1.5em;
+            font-size: 24px;
         }
 
-        .finalize-btn {
-            width: 100%;
-            padding: 15px;
-            background: #4caf50;
-            color: #fff;
-            border: none;
+        .type-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .type-selector button {
+            padding: 10px;
+            background: #0f3460;
+            border: 2px solid #ff6b35;
+            color: #ff6b35;
             border-radius: 5px;
             cursor: pointer;
-            font-weight: bold;
-            font-size: 1.1em;
             transition: all 0.3s;
         }
 
-        .finalize-btn:hover {
-            background: #45a049;
-            transform: translateY(-2px);
+        .type-selector button.selected {
+            background: #ff6b35;
+            color: white;
         }
 
-        .finalize-btn:disabled {
-            background: #666;
-            cursor: not-allowed;
+        .list-item {
+            background: #1a1a2e;
+            border-left: 4px solid #ff6b35;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-item-info h3 {
+            color: #ff6b35;
+            margin-bottom: 5px;
+        }
+
+        .list-item-info p {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .list-item-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .list-item-actions button {
+            padding: 8px 12px;
+            font-size: 12px;
         }
 
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 40px;
             color: #999;
         }
 
         .empty-state-icon {
-            font-size: 3em;
+            font-size: 48px;
             margin-bottom: 10px;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .success-message {
-            background: #4caf50;
-            color: white;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            display: none;
-            animation: slideDown 0.3s ease;
-        }
-
-        .success-message.show {
-            display: block;
-        }
-
-        @keyframes slideDown {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
         }
 
         .stat-card {
             background: #0f3460;
-            padding: 15px;
+            border: 2px solid #ff6b35;
             border-radius: 8px;
+            padding: 20px;
             text-align: center;
-            border-left: 4px solid #ff6b35;
         }
 
-        .stat-value {
-            font-size: 1.5em;
+        .stat-card h3 {
             color: #ff6b35;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            color: #4caf50;
+            font-size: 28px;
             font-weight: bold;
         }
 
-        .stat-label {
-            color: #999;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background: #0f3460;
-            padding: 12px;
-            text-align: left;
-            color: #ff6b35;
-            font-weight: bold;
-            border-bottom: 2px solid #ff6b35;
-        }
-
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #0f3460;
-        }
-
-        tr:hover {
-            background: #0f3460;
-        }
-
-        .btn-small {
-            padding: 5px 10px;
-            background: #ff6b35;
-            color: #fff;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-right: 5px;
-        }
-
-        .btn-small:hover {
-            background: #ff5722;
-        }
-
-        .btn-small.danger {
-            background: #f44336;
-        }
-
-        .btn-small.danger:hover {
-            background: #da190b;
-        }
-
-        @media (max-width: 1024px) {
-            .container {
+        @media (max-width: 768px) {
+            .two-column {
                 grid-template-columns: 1fr;
             }
 
-            .products-grid {
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .nav-tabs button {
+                width: 100%;
+            }
+
+            .product-grid {
                 grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             }
         }
@@ -406,343 +382,359 @@
 <body>
     <div class="header">
         <h1>🍔 Food Truck Manager</h1>
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('vendas')">Vendas</button>
-            <button class="tab-btn" onclick="switchTab('cozinha')">👨‍🍳 Cozinha</button>
-            <button class="tab-btn" onclick="switchTab('clientes')">👥 Clientes</button>
-            <button class="tab-btn" onclick="switchTab('produtos')">🍽️ Produtos</button>
-            <button class="tab-btn" onclick="switchTab('combos')">🎁 Combos</button>
-            <button class="tab-btn" onclick="switchTab('estoque')">📦 Estoque</button>
-            <button class="tab-btn" onclick="switchTab('despesas')">💰 Despesas</button>
-            <button class="tab-btn" onclick="switchTab('perdicio')">🗑️ Perdício</button>
-            <button class="tab-btn" onclick="switchTab('relatorios')">📈 Relatórios</button>
-            <button class="tab-btn" onclick="switchTab('config')">⚙️ Configurações</button>
+        <div class="nav-tabs">
+            <button class="tab-btn active" data-tab="vendas">Vendas</button>
+            <button class="tab-btn" data-tab="cozinha">👨‍🍳 Cozinha</button>
+            <button class="tab-btn" data-tab="clientes">👥 Clientes</button>
+            <button class="tab-btn" data-tab="produtos">🍽️ Produtos</button>
+            <button class="tab-btn" data-tab="combos">🎁 Combos</button>
+            <button class="tab-btn" data-tab="estoque">📦 Estoque</button>
+            <button class="tab-btn" data-tab="despesas">💰 Despesas</button>
+            <button class="tab-btn" data-tab="perdicio">🗑️ Perdício</button>
+            <button class="tab-btn" data-tab="relatorios">📈 Relatórios</button>
+            <button class="tab-btn" data-tab="configuracoes">⚙️ Configurações</button>
         </div>
     </div>
 
-    <div id="success-message" class="success-message"></div>
+    <div class="container">
+        <!-- ABA VENDAS -->
+        <div id="vendas" class="content active">
+            <div class="two-column">
+                <div class="card">
+                    <h2>🍽️ Produtos Disponíveis</h2>
+                    <div id="productsList" class="product-grid"></div>
+                </div>
 
-    <!-- TAB VENDAS -->
-    <div id="vendas" class="tab-content active">
-        <div class="container">
-            <!-- PRODUTOS -->
-            <div class="section">
-                <h2>Produtos Disponíveis</h2>
-                <div class="products-grid" id="products-list">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📦</div>
-                        <p>Nenhum produto cadastrado</p>
+                <div class="card">
+                    <h2>🛒 Carrinho de Compras</h2>
+                    
+                    <div class="form-group">
+                        <label>Tipo de Pedido</label>
+                        <div class="type-selector">
+                            <button class="type-btn" data-type="para-viagem">Para Viagem</button>
+                            <button class="type-btn selected" data-type="local">Local</button>
+                        </div>
                     </div>
+
+                    <div class="form-group">
+                        <label>Origem</label>
+                        <div class="type-selector">
+                            <button class="origin-btn selected" data-origin="venda-local">Venda Local</button>
+                            <button class="origin-btn" data-origin="ifoods">iFoods</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nome do Cliente</label>
+                        <input type="text" id="clientName" placeholder="Buscar ou Adicionar Cliente">
+                    </div>
+
+                    <div class="form-group">
+                        <label>WhatsApp (Opcional)</label>
+                        <input type="text" id="clientWhatsapp" placeholder="Número do WhatsApp">
+                    </div>
+
+                    <div id="cartItems" style="max-height: 300px; overflow-y: auto;"></div>
+
+                    <div class="cart-total">
+                        <h3>Total: R$ <span id="cartTotal">0.00</span></h3>
+                    </div>
+
+                    <button class="btn-primary" onclick="finalizarVenda()">✓ Finalizar Venda</button>
                 </div>
             </div>
+        </div>
 
-            <!-- CARRINHO -->
-            <div class="section">
-                <h2>🛒 Carrinho de Compras</h2>
+        <!-- ABA COZINHA -->
+        <div id="cozinha" class="content">
+            <div class="card">
+                <h2>👨‍🍳 Pedidos Pendentes</h2>
+                <div id="kitchenOrders"></div>
+            </div>
+        </div>
 
-                <div class="form-group">
-                    <label>Tipo de Pedido</label>
+        <!-- ABA CLIENTES -->
+        <div id="clientes" class="content">
+            <div class="two-column">
+                <div class="card">
+                    <h2>Novo Cliente</h2>
+                    <div class="form-group">
+                        <label>Nome</label>
+                        <input type="text" id="newClientName" placeholder="Nome do cliente">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="text" id="newClientPhone" placeholder="Telefone">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="newClientEmail" placeholder="Email">
+                    </div>
+                    <button class="btn-primary" onclick="adicionarCliente()">Adicionar Cliente</button>
+                </div>
+
+                <div class="card">
+                    <h2>Lista de Clientes</h2>
+                    <div id="clientsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA PRODUTOS -->
+        <div id="produtos" class="content">
+            <div class="two-column">
+                <div class="card">
+                    <h2>Novo Produto</h2>
+                    <div class="form-group">
+                        <label>Nome</label>
+                        <input type="text" id="newProductName" placeholder="Nome do produto">
+                    </div>
+                    <div class="form-group">
+                        <label>Preço</label>
+                        <input type="number" id="newProductPrice" placeholder="Preço" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Descrição</label>
+                        <textarea id="newProductDesc" placeholder="Descrição"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoria</label>
+                        <select id="newProductCategory">
+                            <option value="Hamburguer">Hamburguer</option>
+                            <option value="Bebida">Bebida</option>
+                            <option value="Acompanhamento">Acompanhamento</option>
+                            <option value="Sobremesa">Sobremesa</option>
+                        </select>
+                    </div>
                     <div class="button-group">
-                        <button class="secondary" onclick="setPedidoType('viagem')">Para Viagem</button>
-                        <button class="secondary" onclick="setPedidoType('local')">Local</button>
+                        <button class="btn-primary" onclick="adicionarProduto()">Salvar</button>
+                        <button class="btn-secondary" onclick="limparFormularioProduto()">Cancelar</button>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Origem</label>
-                    <div class="button-group">
-                        <button class="secondary" onclick="setOrigem('local')">Venda Local</button>
-                        <button class="secondary" onclick="setOrigem('ifood')">iFoods</button>
+                <div class="card">
+                    <h2>Lista de Produtos</h2>
+                    <div id="productsList2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA ESTOQUE -->
+        <div id="estoque" class="content">
+            <div class="two-column">
+                <div class="card">
+                    <h2>Novo Ingrediente</h2>
+                    <div class="form-group">
+                        <label>Nome</label>
+                        <input type="text" id="newIngredientName" placeholder="Nome do ingrediente">
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Nome do Cliente</label>
-                    <input type="text" id="customer-name" placeholder="Buscar ou Adicionar Cliente">
-                </div>
-
-                <div class="form-group">
-                    <label>WhatsApp (Opcional)</label>
-                    <input type="text" id="customer-whatsapp" placeholder="Número do WhatsApp">
-                </div>
-
-                <div id="cart-items" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
-                    <div class="empty-state">
-                        <p>Selecione produtos para adicionar ao carrinho.</p>
+                    <div class="form-group">
+                        <label>Quantidade</label>
+                        <input type="number" id="newIngredientQty" placeholder="Quantidade" step="0.01">
                     </div>
+                    <div class="form-group">
+                        <label>Unidade</label>
+                        <select id="newIngredientUnit">
+                            <option value="kg">kg</option>
+                            <option value="L">L</option>
+                            <option value="un">un</option>
+                            <option value="g">g</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" onclick="adicionarIngrediente()">Adicionar</button>
                 </div>
 
-                <div class="cart-total">
-                    Total: <span class="cart-total-value" id="cart-total">R$ 0,00</span>
-                </div>
-
-                <button class="finalize-btn" onclick="finalizeSale()">✓ Finalizar Venda</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB COZINHA -->
-    <div id="cozinha" class="tab-content">
-        <div class="section" style="max-width: 1400px; margin: 20px auto;">
-            <h2>👨‍🍳 Pedidos Pendentes</h2>
-            <div id="kitchen-orders">
-                <div class="empty-state">
-                    <div class="empty-state-icon">👨‍🍳</div>
-                    <p>Nenhum pedido pendente</p>
+                <div class="card">
+                    <h2>Estoque Atual</h2>
+                    <div id="inventoryList"></div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- TAB CLIENTES -->
-    <div id="clientes" class="tab-content">
-        <div class="section" style="max-width: 1400px; margin: 20px auto;">
-            <h2>👥 Clientes</h2>
-            <button class="btn-small" onclick="openCustomerModal()">+ Novo Cliente</button>
-            <div class="table-container" style="margin-top: 20px;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Email</th>
-                            <th>Telefone</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="customers-table">
-                        <tr>
-                            <td colspan="4" style="text-align: center; color: #999;">Nenhum cliente cadastrado</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB PRODUTOS -->
-    <div id="produtos" class="tab-content">
-        <div class="section" style="max-width: 1400px; margin: 20px auto;">
-            <h2>🍽️ Produtos</h2>
-            <button class="btn-small" onclick="openProductModal()">+ Novo Produto</button>
-            <div class="table-container" style="margin-top: 20px;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Descrição</th>
-                            <th>Preço</th>
-                            <th>Categoria</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="products-table">
-                        <tr>
-                            <td colspan="5" style="text-align: center; color: #999;">Nenhum produto cadastrado</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB ESTOQUE -->
-    <div id="estoque" class="tab-content">
-        <div class="section" style="max-width: 1400px; margin: 20px auto;">
-            <h2>📦 Estoque</h2>
-            <button class="btn-small" onclick="openInventoryModal()">+ Novo Ingrediente</button>
-            <div class="table-container" style="margin-top: 20px;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Quantidade</th>
-                            <th>Unidade</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="inventory-table">
-                        <tr>
-                            <td colspan="4" style="text-align: center; color: #999;">Nenhum ingrediente cadastrado</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB DESPESAS -->
-    <div id="despesas" class="tab-content">
-        <div class="section" style="max-width: 1400px; margin: 20px auto;">
-            <h2>💰 Despesas</h2>
-            <button class="btn-small" onclick="openExpenseModal()">+ Nova Despesa</button>
-            <div class="table-container" style="margin-top: 20px;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Descrição</th>
-                            <th>Valor</th>
-                            <th>Data</th>
-                            <th>Categoria</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="expenses-table">
-                        <tr>
-                            <td colspan="5" style="text-align: center; color: #999;">Nenhuma despesa cadastrada</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB RELATÓRIOS -->
-    <div id="relatorios" class="tab-content">
-        <div class="section" style="max-width: 1400px; margin: 20px auto;">
-            <h2>📈 Relatórios</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="total-sales">R$ 0,00</div>
-                    <div class="stat-label">Total de Vendas</div>
+        <!-- ABA DESPESAS -->
+        <div id="despesas" class="content">
+            <div class="two-column">
+                <div class="card">
+                    <h2>Nova Despesa</h2>
+                    <div class="form-group">
+                        <label>Descrição</label>
+                        <input type="text" id="expenseDesc" placeholder="Descrição da despesa">
+                    </div>
+                    <div class="form-group">
+                        <label>Valor</label>
+                        <input type="number" id="expenseValue" placeholder="Valor" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Categoria</label>
+                        <select id="expenseCategory">
+                            <option value="Alimentos">Alimentos</option>
+                            <option value="Combustível">Combustível</option>
+                            <option value="Manutenção">Manutenção</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" onclick="adicionarDespesa()">Registrar</button>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="total-orders">0</div>
-                    <div class="stat-label">Pedidos Hoje</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="total-customers">0</div>
-                    <div class="stat-label">Clientes</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="total-expenses">R$ 0,00</div>
-                    <div class="stat-label">Despesas</div>
+
+                <div class="card">
+                    <h2>Despesas do Dia</h2>
+                    <div id="expensesList"></div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- TAB CONFIGURAÇÕES -->
-    <div id="config" class="tab-content">
-        <div class="section" style="max-width: 1400px; margin: 20px auto;">
-            <h2>⚙️ Configurações</h2>
-            <div class="form-group">
-                <label>Nome da Loja</label>
-                <input type="text" id="store-name" placeholder="Nome da sua loja">
+        <!-- ABA RELATÓRIOS -->
+        <div id="relatorios" class="content">
+            <div class="stats-grid" id="statsGrid"></div>
+            <div class="card">
+                <h2>Vendas do Dia</h2>
+                <div id="salesList"></div>
             </div>
-            <div class="form-group">
-                <label>Telefone</label>
-                <input type="text" id="store-phone" placeholder="Telefone">
+        </div>
+
+        <!-- ABA CONFIGURAÇÕES -->
+        <div id="configuracoes" class="content">
+            <div class="card">
+                <h2>Configurações da Loja</h2>
+                <div class="form-group">
+                    <label>Nome da Loja</label>
+                    <input type="text" id="storeName" placeholder="Nome da loja">
+                </div>
+                <div class="form-group">
+                    <label>Telefone</label>
+                    <input type="text" id="storePhone" placeholder="Telefone">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="storeEmail" placeholder="Email">
+                </div>
+                <button class="btn-primary" onclick="salvarConfigurações()">Salvar Configurações</button>
             </div>
-            <button class="btn-small" onclick="saveSettings()">Salvar Configurações</button>
         </div>
     </div>
 
     <script>
-        // Supabase Configuration
-        const SUPABASE_URL = "https://xnsjlnwfqnrwxzqfhgqz.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhuc2psbnpmcW5yd3h6cWZoZ3F6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzczMjQ2NTQsImV4cCI6MjA1MjkwMDY1NH0.uP-fgzDPjQwVhVMSjzDjTYAV1GpnXvCqZO3Hy_HBvzc";
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Inicializar Supabase
+        const SUPABASE_URL = 'https://nnpifmbfwyraptfksjwo.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ucGlmbWJmd3lyYXB0ZmtzandvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1ODE5NjYsImV4cCI6MjA3NzE1Nzk2Nn0.QTmxkS8DylHG0VIZBsNVsolsgfnImwuu_jmsBp7xR_Q';
 
-        let products = [];
+        const { createClient } = window.supabase;
+        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Dados locais
         let cart = [];
-        let customers = [];
-        let orders = [];
-        let ingredients = [];
+        let products = [];
+        let clients = [];
+        let inventory = [];
         let expenses = [];
-        let pedidoType = 'viagem';
-        let origem = 'local';
+        let orders = [];
+        let selectedOrderType = 'local';
+        let selectedOrigin = 'venda-local';
 
-        // Initialize
-        async function init() {
-            await loadProducts();
-            await loadCustomers();
-            await loadOrders();
-            await loadIngredients();
-            await loadExpenses();
-            updateDashboard();
-        }
-
-        // Tab switching
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        // Products
-        async function loadProducts() {
+        // Carregar dados ao iniciar
+        async function loadData() {
             try {
-                const { data, error } = await supabase.from('products').select('*');
-                if (error) throw error;
-                products = data || [];
-                renderProducts();
+                // Carregar produtos
+                const { data: productsData } = await supabase.from('products').select('*');
+                if (productsData) products = productsData;
+                
+                // Carregar clientes
+                const { data: clientsData } = await supabase.from('clients').select('*');
+                if (clientsData) clients = clientsData;
+                
+                // Carregar estoque
+                const { data: inventoryData } = await supabase.from('inventory').select('*');
+                if (inventoryData) inventory = inventoryData;
+                
+                // Carregar despesas
+                const { data: expensesData } = await supabase.from('expenses').select('*');
+                if (expensesData) expenses = expensesData;
+                
+                // Carregar pedidos
+                const { data: ordersData } = await supabase.from('orders').select('*');
+                if (ordersData) orders = ordersData;
             } catch (error) {
-                console.error('Erro ao carregar produtos:', error);
+                console.log('Usando dados locais (Supabase não disponível)');
+                // Usar dados locais se Supabase não estiver disponível
             }
+
+            renderProducts();
+            renderProductsList();
+            renderClientsList();
+            renderInventory();
+            renderExpenses();
+            renderKitchenOrders();
+            renderStats();
         }
 
+        // Abas
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Seletores de tipo
+        document.querySelectorAll('.type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedOrderType = btn.dataset.type;
+            });
+        });
+
+        document.querySelectorAll('.origin-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.origin-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedOrigin = btn.dataset.origin;
+            });
+        });
+
+        // Renderizar produtos
         function renderProducts() {
-            const container = document.getElementById('products-list');
+            const list = document.getElementById('productsList');
             if (products.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📦</div><p>Nenhum produto cadastrado</p></div>';
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div>Nenhum produto cadastrado</div>';
                 return;
             }
 
-            container.innerHTML = products.map(product => `
-                <div class="product-card" onclick="addToCart(${product.id}, '${product.name}', ${product.price})">
-                    <div class="product-name">${product.name}</div>
-                    <div class="product-price">R$ ${parseFloat(product.price).toFixed(2)}</div>
-                    <div class="product-lucro">Lucro: R$ ${parseFloat(product.price * 0.3).toFixed(2)}</div>
+            list.innerHTML = products.map(p => `
+                <div class="product-card" onclick="adicionarAoCarrinho(${p.id}, '${p.name}', ${p.price})">
+                    <h3>${p.name}</h3>
+                    <p class="price">R$ ${parseFloat(p.price).toFixed(2)}</p>
                 </div>
             `).join('');
         }
 
-        async function saveProduct() {
-            const name = document.getElementById('product-name').value;
-            const price = document.getElementById('product-price').value;
-            const description = document.getElementById('product-description').value;
-            const category = document.getElementById('product-category').value;
-
-            if (!name || !price) {
-                alert('Preencha os campos obrigatórios');
+        function renderProductsList() {
+            const list = document.getElementById('productsList2');
+            if (products.length === 0) {
+                list.innerHTML = '<div class="empty-state">Nenhum produto cadastrado</div>';
                 return;
             }
 
-            try {
-                const { error } = await supabase.from('products').insert([{
-                    name,
-                    price: parseFloat(price),
-                    description,
-                    category
-                }]);
-
-                if (error) throw error;
-                await loadProducts();
-                showSuccess('Produto salvo!');
-                closeModal('productModal');
-            } catch (error) {
-                alert('Erro: ' + error.message);
-            }
+            list.innerHTML = products.map(p => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <h3>${p.name}</h3>
+                        <p>R$ ${parseFloat(p.price).toFixed(2)}</p>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="btn-danger" onclick="deletarProduto(${p.id})">Deletar</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        async function deleteProduct(id) {
-            if (!confirm('Deletar este produto?')) return;
-            try {
-                const { error } = await supabase.from('products').delete().eq('id', id);
-                if (error) throw error;
-                await loadProducts();
-                showSuccess('Produto deletado!');
-            } catch (error) {
-                alert('Erro: ' + error.message);
-            }
-        }
-
-        // Cart
-        function addToCart(id, name, price) {
-            const item = cart.find(i => i.id === id);
-            if (item) {
-                item.quantity++;
+        // Adicionar ao carrinho
+        function adicionarAoCarrinho(id, name, price) {
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.quantity++;
             } else {
                 cart.push({ id, name, price, quantity: 1 });
             }
@@ -750,486 +742,352 @@
         }
 
         function renderCart() {
-            const container = document.getElementById('cart-items');
-            const totalElement = document.getElementById('cart-total');
-
+            const cartDiv = document.getElementById('cartItems');
             if (cart.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>Selecione produtos para adicionar ao carrinho.</p></div>';
-                totalElement.textContent = 'R$ 0,00';
-                return;
-            }
-
-            let total = 0;
-            container.innerHTML = cart.map(item => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-                return `
+                cartDiv.innerHTML = '<p style="text-align: center; color: #999;">Selecione produtos para adicionar ao carrinho.</p>';
+            } else {
+                cartDiv.innerHTML = cart.map((item, idx) => `
                     <div class="cart-item">
                         <div class="cart-item-info">
                             <div class="cart-item-name">${item.name}</div>
-                            <div class="cart-item-qty">Qtd: <strong>${item.quantity}</strong></div>
+                            <div class="cart-item-price">R$ ${(item.price * item.quantity).toFixed(2)}</div>
                         </div>
-                        <div class="cart-item-price">R$ ${itemTotal.toFixed(2)}</div>
-                        <button class="cart-item-remove" onclick="removeFromCart(${item.id})">✕</button>
+                        <div class="cart-item-controls">
+                            <input type="number" value="${item.quantity}" onchange="alterarQuantidade(${idx}, this.value)">
+                            <button class="btn-danger" onclick="removerDoCarrinho(${idx})">✕</button>
+                        </div>
                     </div>
-                `;
-            }).join('');
-
-            totalElement.textContent = `R$ ${total.toFixed(2)}`;
+                `).join('');
+            }
+            atualizarTotal();
         }
 
-        function removeFromCart(id) {
-            cart = cart.filter(item => item.id !== id);
+        function alterarQuantidade(idx, qty) {
+            cart[idx].quantity = parseInt(qty) || 1;
             renderCart();
         }
 
-        function setPedidoType(type) {
-            pedidoType = type;
+        function removerDoCarrinho(idx) {
+            cart.splice(idx, 1);
+            renderCart();
         }
 
-        function setOrigem(orig) {
-            origem = orig;
+        function atualizarTotal() {
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('cartTotal').textContent = total.toFixed(2);
         }
 
-        // Sales
-        async function finalizeSale() {
-            const customerName = document.getElementById('customer-name').value;
-            if (!customerName) {
-                alert('Digite o nome do cliente');
-                return;
-            }
-
+        // Finalizar venda
+        async function finalizarVenda() {
             if (cart.length === 0) {
-                alert('Carrinho vazio');
+                alert('Carrinho vazio!');
                 return;
             }
 
+            const clientName = document.getElementById('clientName').value || 'Cliente Anônimo';
+            const clientWhatsapp = document.getElementById('clientWhatsapp').value || '';
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            const order = {
+                client_name: clientName,
+                client_whatsapp: clientWhatsapp,
+                order_type: selectedOrderType,
+                origin: selectedOrigin,
+                items: cart,
+                total: total,
+                status: 'pendente',
+                created_at: new Date().toISOString()
+            };
+
             try {
-                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-                const { error } = await supabase.from('sales').insert([{
-                    customer_name: customerName,
-                    customer_whatsapp: document.getElementById('customer-whatsapp').value,
-                    items: JSON.stringify(cart),
-                    total: total,
-                    pedido_type: pedidoType,
-                    origem: origem,
-                    status: 'pending'
-                }]);
-
+                const { error } = await supabase.from('orders').insert([order]);
                 if (error) throw error;
-
-                cart = [];
-                document.getElementById('customer-name').value = '';
-                document.getElementById('customer-whatsapp').value = '';
-                renderCart();
-                showSuccess('Venda finalizada!');
-                await loadOrders();
-                updateDashboard();
             } catch (error) {
-                alert('Erro: ' + error.message);
+                console.log('Salvando localmente');
             }
+
+            orders.push(order);
+            cart = [];
+            document.getElementById('clientName').value = '';
+            document.getElementById('clientWhatsapp').value = '';
+            renderCart();
+            renderKitchenOrders();
+            alert('Venda finalizada com sucesso!');
         }
 
-        // Customers
-        async function loadCustomers() {
-            try {
-                const { data, error } = await supabase.from('customers').select('*');
-                if (error) throw error;
-                customers = data || [];
-                renderCustomers();
-            } catch (error) {
-                console.error('Erro:', error);
-            }
-        }
+        // Produtos
+        async function adicionarProduto() {
+            const name = document.getElementById('newProductName').value;
+            const price = document.getElementById('newProductPrice').value;
+            const desc = document.getElementById('newProductDesc').value;
+            const category = document.getElementById('newProductCategory').value;
 
-        function renderCustomers() {
-            const table = document.getElementById('customers-table');
-            if (customers.length === 0) {
-                table.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">Nenhum cliente cadastrado</td></tr>';
+            if (!name || !price) {
+                alert('Preencha os campos obrigatórios');
                 return;
             }
 
-            table.innerHTML = customers.map(customer => `
-                <tr>
-                    <td>${customer.name}</td>
-                    <td>${customer.email || '-'}</td>
-                    <td>${customer.phone || '-'}</td>
-                    <td>
-                        <button class="btn-small danger" onclick="deleteCustomer(${customer.id})">Deletar</button>
-                    </td>
-                </tr>
-            `).join('');
+            const product = { name, price: parseFloat(price), description: desc, category };
+
+            try {
+                const { data } = await supabase.from('products').insert([product]).select();
+                if (data) products.push(data[0]);
+            } catch (error) {
+                console.log('Salvando localmente');
+                product.id = Date.now();
+                products.push(product);
+            }
+
+            limparFormularioProduto();
+            renderProducts();
+            renderProductsList();
         }
 
-        async function saveCustomer() {
-            const name = document.getElementById('customer-name-input').value;
-            const email = document.getElementById('customer-email').value;
-            const phone = document.getElementById('customer-phone').value;
+        function limparFormularioProduto() {
+            document.getElementById('newProductName').value = '';
+            document.getElementById('newProductPrice').value = '';
+            document.getElementById('newProductDesc').value = '';
+        }
+
+        async function deletarProduto(id) {
+            if (!confirm('Deletar produto?')) return;
+            try {
+                await supabase.from('products').delete().eq('id', id);
+            } catch (error) {
+                console.log('Deletando localmente');
+            }
+            products = products.filter(p => p.id !== id);
+            renderProducts();
+            renderProductsList();
+        }
+
+        // Clientes
+        async function adicionarCliente() {
+            const name = document.getElementById('newClientName').value;
+            const phone = document.getElementById('newClientPhone').value;
+            const email = document.getElementById('newClientEmail').value;
 
             if (!name) {
                 alert('Preencha o nome');
                 return;
             }
 
+            const client = { name, phone, email };
+
             try {
-                const { error } = await supabase.from('customers').insert([{ name, email, phone }]);
-                if (error) throw error;
-                await loadCustomers();
-                showSuccess('Cliente salvo!');
-                closeModal('customerModal');
+                const { data } = await supabase.from('clients').insert([client]).select();
+                if (data) clients.push(data[0]);
             } catch (error) {
-                alert('Erro: ' + error.message);
+                console.log('Salvando localmente');
+                client.id = Date.now();
+                clients.push(client);
             }
+
+            document.getElementById('newClientName').value = '';
+            document.getElementById('newClientPhone').value = '';
+            document.getElementById('newClientEmail').value = '';
+            renderClientsList();
         }
 
-        async function deleteCustomer(id) {
-            if (!confirm('Deletar?')) return;
-            try {
-                const { error } = await supabase.from('customers').delete().eq('id', id);
-                if (error) throw error;
-                await loadCustomers();
-                showSuccess('Cliente deletado!');
-            } catch (error) {
-                alert('Erro: ' + error.message);
-            }
-        }
-
-        // Orders
-        async function loadOrders() {
-            try {
-                const { data, error } = await supabase.from('sales').select('*').order('created_at', { ascending: false });
-                if (error) throw error;
-                orders = data || [];
-                renderKitchen();
-            } catch (error) {
-                console.error('Erro:', error);
-            }
-        }
-
-        function renderKitchen() {
-            const container = document.getElementById('kitchen-orders');
-            const pending = orders.filter(o => o.status === 'pending');
-
-            if (pending.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👨‍🍳</div><p>Nenhum pedido pendente</p></div>';
+        function renderClientsList() {
+            const list = document.getElementById('clientsList');
+            if (clients.length === 0) {
+                list.innerHTML = '<div class="empty-state">Nenhum cliente cadastrado</div>';
                 return;
             }
 
-            container.innerHTML = pending.map(order => `
-                <div class="section" style="margin-bottom: 20px;">
-                    <h3>Pedido #${order.id}</h3>
-                    <p><strong>Cliente:</strong> ${order.customer_name}</p>
-                    <p><strong>Itens:</strong> ${JSON.parse(order.items).map(i => `${i.name} (${i.quantity})`).join(', ')}</p>
-                    <p><strong>Total:</strong> R$ ${parseFloat(order.total).toFixed(2)}</p>
-                    <div class="button-group">
-                        <button onclick="completeOrder(${order.id})">✓ Pronto</button>
-                        <button class="secondary" onclick="cancelOrder(${order.id})">✕ Cancelar</button>
+            list.innerHTML = clients.map(c => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <h3>${c.name}</h3>
+                        <p>${c.phone || 'Sem telefone'}</p>
                     </div>
                 </div>
             `).join('');
         }
 
-        async function completeOrder(id) {
-            try {
-                const { error } = await supabase.from('sales').update({ status: 'completed' }).eq('id', id);
-                if (error) throw error;
-                await loadOrders();
-                showSuccess('Pedido pronto!');
-            } catch (error) {
-                alert('Erro: ' + error.message);
-            }
-        }
+        // Estoque
+        async function adicionarIngrediente() {
+            const name = document.getElementById('newIngredientName').value;
+            const qty = document.getElementById('newIngredientQty').value;
+            const unit = document.getElementById('newIngredientUnit').value;
 
-        async function cancelOrder(id) {
-            if (!confirm('Cancelar pedido?')) return;
-            try {
-                const { error } = await supabase.from('sales').delete().eq('id', id);
-                if (error) throw error;
-                await loadOrders();
-                showSuccess('Pedido cancelado!');
-            } catch (error) {
-                alert('Erro: ' + error.message);
+            if (!name || !qty) {
+                alert('Preencha os campos');
+                return;
             }
-        }
 
-        // Inventory
-        async function loadIngredients() {
+            const ingredient = { name, quantity: parseFloat(qty), unit };
+
             try {
-                const { data, error } = await supabase.from('ingredients').select('*');
-                if (error) throw error;
-                ingredients = data || [];
-                renderInventory();
+                const { data } = await supabase.from('inventory').insert([ingredient]).select();
+                if (data) inventory.push(data[0]);
             } catch (error) {
-                console.error('Erro:', error);
+                console.log('Salvando localmente');
+                ingredient.id = Date.now();
+                inventory.push(ingredient);
             }
+
+            document.getElementById('newIngredientName').value = '';
+            document.getElementById('newIngredientQty').value = '';
+            renderInventory();
         }
 
         function renderInventory() {
-            const table = document.getElementById('inventory-table');
-            if (ingredients.length === 0) {
-                table.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">Nenhum ingrediente cadastrado</td></tr>';
+            const list = document.getElementById('inventoryList');
+            if (inventory.length === 0) {
+                list.innerHTML = '<div class="empty-state">Nenhum ingrediente cadastrado</div>';
                 return;
             }
 
-            table.innerHTML = ingredients.map(item => `
-                <tr>
-                    <td>${item.name}</td>
-                    <td>${item.quantity}</td>
-                    <td>${item.unit}</td>
-                    <td>
-                        <button class="btn-small danger" onclick="deleteIngredient(${item.id})">Deletar</button>
-                    </td>
-                </tr>
+            list.innerHTML = inventory.map(i => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <h3>${i.name}</h3>
+                        <p>${i.quantity} ${i.unit}</p>
+                    </div>
+                </div>
             `).join('');
         }
 
-        async function saveIngredient() {
-            const name = document.getElementById('ingredient-name').value;
-            const quantity = document.getElementById('ingredient-quantity').value;
-            const unit = document.getElementById('ingredient-unit').value;
+        // Despesas
+        async function adicionarDespesa() {
+            const desc = document.getElementById('expenseDesc').value;
+            const value = document.getElementById('expenseValue').value;
+            const category = document.getElementById('expenseCategory').value;
 
-            if (!name || !quantity || !unit) {
-                alert('Preencha todos os campos');
+            if (!desc || !value) {
+                alert('Preencha os campos');
                 return;
             }
 
-            try {
-                const { error } = await supabase.from('ingredients').insert([{
-                    name,
-                    quantity: parseFloat(quantity),
-                    unit
-                }]);
+            const expense = { description: desc, value: parseFloat(value), category, created_at: new Date().toISOString() };
 
-                if (error) throw error;
-                await loadIngredients();
-                showSuccess('Ingrediente salvo!');
-                closeModal('inventoryModal');
-            } catch (error) {
-                alert('Erro: ' + error.message);
-            }
-        }
-
-        async function deleteIngredient(id) {
-            if (!confirm('Deletar?')) return;
             try {
-                const { error } = await supabase.from('ingredients').delete().eq('id', id);
-                if (error) throw error;
-                await loadIngredients();
-                showSuccess('Ingrediente deletado!');
+                const { data } = await supabase.from('expenses').insert([expense]).select();
+                if (data) expenses.push(data[0]);
             } catch (error) {
-                alert('Erro: ' + error.message);
+                console.log('Salvando localmente');
+                expense.id = Date.now();
+                expenses.push(expense);
             }
-        }
 
-        // Expenses
-        async function loadExpenses() {
-            try {
-                const { data, error } = await supabase.from('expenses').select('*');
-                if (error) throw error;
-                expenses = data || [];
-                renderExpenses();
-            } catch (error) {
-                console.error('Erro:', error);
-            }
+            document.getElementById('expenseDesc').value = '';
+            document.getElementById('expenseValue').value = '';
+            renderExpenses();
         }
 
         function renderExpenses() {
-            const table = document.getElementById('expenses-table');
-            if (expenses.length === 0) {
-                table.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">Nenhuma despesa cadastrada</td></tr>';
+            const list = document.getElementById('expensesList');
+            const today = new Date().toDateString();
+            const todayExpenses = expenses.filter(e => new Date(e.created_at).toDateString() === today);
+
+            if (todayExpenses.length === 0) {
+                list.innerHTML = '<div class="empty-state">Nenhuma despesa registrada</div>';
                 return;
             }
 
-            table.innerHTML = expenses.map(expense => `
-                <tr>
-                    <td>${expense.description}</td>
-                    <td>R$ ${parseFloat(expense.value).toFixed(2)}</td>
-                    <td>${new Date(expense.created_at).toLocaleDateString('pt-BR')}</td>
-                    <td>${expense.category}</td>
-                    <td>
-                        <button class="btn-small danger" onclick="deleteExpense(${expense.id})">Deletar</button>
-                    </td>
-                </tr>
+            list.innerHTML = todayExpenses.map(e => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <h3>${e.description}</h3>
+                        <p>${e.category}</p>
+                    </div>
+                    <div style="color: #d32f2f; font-weight: bold;">R$ ${parseFloat(e.value).toFixed(2)}</div>
+                </div>
             `).join('');
         }
 
-        async function saveExpense() {
-            const description = document.getElementById('expense-description').value;
-            const value = document.getElementById('expense-value').value;
-            const category = document.getElementById('expense-category').value;
+        // Cozinha
+        function renderKitchenOrders() {
+            const list = document.getElementById('kitchenOrders');
+            const pendingOrders = orders.filter(o => o.status === 'pendente');
 
-            if (!description || !value || !category) {
-                alert('Preencha todos os campos');
+            if (pendingOrders.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✓</div>Nenhum pedido pendente</div>';
                 return;
             }
 
-            try {
-                const { error } = await supabase.from('expenses').insert([{
-                    description,
-                    value: parseFloat(value),
-                    category
-                }]);
+            list.innerHTML = pendingOrders.map((order, idx) => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <h3>${order.client_name}</h3>
+                        <p>${order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</p>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="btn-primary" onclick="marcarPronto(${idx})">Pronto</button>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-                if (error) throw error;
-                await loadExpenses();
-                showSuccess('Despesa salva!');
-                closeModal('expenseModal');
-            } catch (error) {
-                alert('Erro: ' + error.message);
+        function marcarPronto(idx) {
+            if (orders[idx]) {
+                orders[idx].status = 'pronto';
+                renderKitchenOrders();
             }
         }
 
-        async function deleteExpense(id) {
-            if (!confirm('Deletar?')) return;
-            try {
-                const { error } = await supabase.from('expenses').delete().eq('id', id);
-                if (error) throw error;
-                await loadExpenses();
-                showSuccess('Despesa deletada!');
-            } catch (error) {
-                alert('Erro: ' + error.message);
+        // Relatórios
+        function renderStats() {
+            const today = new Date().toDateString();
+            const todayOrders = orders.filter(o => new Date(o.created_at).toDateString() === today);
+            const todayExpenses = expenses.filter(e => new Date(e.created_at).toDateString() === today);
+
+            const totalSales = todayOrders.reduce((sum, o) => sum + o.total, 0);
+            const totalExpenses = todayExpenses.reduce((sum, e) => sum + e.value, 0);
+            const profit = totalSales - totalExpenses;
+
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card">
+                    <h3>Vendas do Dia</h3>
+                    <div class="value">R$ ${totalSales.toFixed(2)}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Despesas</h3>
+                    <div class="value">R$ ${totalExpenses.toFixed(2)}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Lucro</h3>
+                    <div class="value" style="color: ${profit >= 0 ? '#4caf50' : '#d32f2f'};">R$ ${profit.toFixed(2)}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Pedidos</h3>
+                    <div class="value">${todayOrders.length}</div>
+                </div>
+            `;
+
+            const salesList = document.getElementById('salesList');
+            if (todayOrders.length === 0) {
+                salesList.innerHTML = '<div class="empty-state">Nenhuma venda hoje</div>';
+            } else {
+                salesList.innerHTML = todayOrders.map(o => `
+                    <div class="list-item">
+                        <div class="list-item-info">
+                            <h3>${o.client_name}</h3>
+                            <p>${o.items.length} item(ns)</p>
+                        </div>
+                        <div style="color: #4caf50; font-weight: bold;">R$ ${o.total.toFixed(2)}</div>
+                    </div>
+                `).join('');
             }
         }
 
-        // Dashboard
-        async function updateDashboard() {
-            const totalSales = orders.filter(o => o.status === 'completed').reduce((sum, o) => sum + parseFloat(o.total), 0);
-            const totalOrders = orders.filter(o => o.status === 'completed').length;
-            const totalExpenses = expenses.reduce((sum, e) => sum + parseFloat(e.value), 0);
+        // Configurações
+        function salvarConfigurações() {
+            const storeName = document.getElementById('storeName').value;
+            const storePhone = document.getElementById('storePhone').value;
+            const storeEmail = document.getElementById('storeEmail').value;
 
-            document.getElementById('total-sales').textContent = `R$ ${totalSales.toFixed(2)}`;
-            document.getElementById('total-orders').textContent = totalOrders;
-            document.getElementById('total-customers').textContent = customers.length;
-            document.getElementById('total-expenses').textContent = `R$ ${totalExpenses.toFixed(2)}`;
-        }
+            localStorage.setItem('storeName', storeName);
+            localStorage.setItem('storePhone', storePhone);
+            localStorage.setItem('storeEmail', storeEmail);
 
-        // Modals
-        function openProductModal() {
-            const modal = `
-                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
-                    <div style="background: #16213e; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; border: 2px solid #ff6b35;">
-                        <h2 style="color: #ff6b35; margin-bottom: 20px;">Novo Produto</h2>
-                        <div class="form-group">
-                            <label>Nome</label>
-                            <input type="text" id="product-name" placeholder="Nome do produto">
-                        </div>
-                        <div class="form-group">
-                            <label>Preço</label>
-                            <input type="number" id="product-price" placeholder="Preço" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label>Descrição</label>
-                            <textarea id="product-description" placeholder="Descrição"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Categoria</label>
-                            <input type="text" id="product-category" placeholder="Categoria">
-                        </div>
-                        <div class="button-group">
-                            <button onclick="saveProduct()">Salvar</button>
-                            <button class="secondary" onclick="this.closest('[style*=position]').remove()">Cancelar</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modal);
-        }
-
-        function openCustomerModal() {
-            const modal = `
-                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
-                    <div style="background: #16213e; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; border: 2px solid #ff6b35;">
-                        <h2 style="color: #ff6b35; margin-bottom: 20px;">Novo Cliente</h2>
-                        <div class="form-group">
-                            <label>Nome</label>
-                            <input type="text" id="customer-name-input" placeholder="Nome">
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" id="customer-email" placeholder="Email">
-                        </div>
-                        <div class="form-group">
-                            <label>Telefone</label>
-                            <input type="text" id="customer-phone" placeholder="Telefone">
-                        </div>
-                        <div class="button-group">
-                            <button onclick="saveCustomer()">Salvar</button>
-                            <button class="secondary" onclick="this.closest('[style*=position]').remove()">Cancelar</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modal);
-        }
-
-        function openInventoryModal() {
-            const modal = `
-                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
-                    <div style="background: #16213e; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; border: 2px solid #ff6b35;">
-                        <h2 style="color: #ff6b35; margin-bottom: 20px;">Novo Ingrediente</h2>
-                        <div class="form-group">
-                            <label>Nome</label>
-                            <input type="text" id="ingredient-name" placeholder="Nome">
-                        </div>
-                        <div class="form-group">
-                            <label>Quantidade</label>
-                            <input type="number" id="ingredient-quantity" placeholder="Quantidade" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label>Unidade</label>
-                            <input type="text" id="ingredient-unit" placeholder="kg, L, un...">
-                        </div>
-                        <div class="button-group">
-                            <button onclick="saveIngredient()">Salvar</button>
-                            <button class="secondary" onclick="this.closest('[style*=position]').remove()">Cancelar</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modal);
-        }
-
-        function openExpenseModal() {
-            const modal = `
-                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
-                    <div style="background: #16213e; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; border: 2px solid #ff6b35;">
-                        <h2 style="color: #ff6b35; margin-bottom: 20px;">Nova Despesa</h2>
-                        <div class="form-group">
-                            <label>Descrição</label>
-                            <input type="text" id="expense-description" placeholder="Descrição">
-                        </div>
-                        <div class="form-group">
-                            <label>Valor</label>
-                            <input type="number" id="expense-value" placeholder="Valor" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label>Categoria</label>
-                            <input type="text" id="expense-category" placeholder="Categoria">
-                        </div>
-                        <div class="button-group">
-                            <button onclick="saveExpense()">Salvar</button>
-                            <button class="secondary" onclick="this.closest('[style*=position]').remove()">Cancelar</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modal);
-        }
-
-        function saveSettings() {
             alert('Configurações salvas!');
         }
 
-        function showSuccess(message) {
-            const el = document.getElementById('success-message');
-            el.textContent = message;
-            el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 3000);
-        }
-
-        // Initialize on load
-        window.addEventListener('load', init);
+        // Carregar dados ao iniciar
+        loadData();
     </script>
 </body>
 </html>
