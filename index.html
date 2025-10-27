@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Truck Manager</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -387,10 +386,8 @@
             <button class="tab-btn" data-tab="cozinha">👨‍🍳 Cozinha</button>
             <button class="tab-btn" data-tab="clientes">👥 Clientes</button>
             <button class="tab-btn" data-tab="produtos">🍽️ Produtos</button>
-            <button class="tab-btn" data-tab="combos">🎁 Combos</button>
             <button class="tab-btn" data-tab="estoque">📦 Estoque</button>
             <button class="tab-btn" data-tab="despesas">💰 Despesas</button>
-            <button class="tab-btn" data-tab="perdicio">🗑️ Perdício</button>
             <button class="tab-btn" data-tab="relatorios">📈 Relatórios</button>
             <button class="tab-btn" data-tab="configuracoes">⚙️ Configurações</button>
         </div>
@@ -490,8 +487,8 @@
                         <input type="text" id="newProductName" placeholder="Nome do produto">
                     </div>
                     <div class="form-group">
-                        <label>Preço</label>
-                        <input type="number" id="newProductPrice" placeholder="Preço" step="0.01">
+                        <label>Preço (R$)</label>
+                        <input type="number" id="newProductPrice" placeholder="0.00" step="0.01" min="0">
                     </div>
                     <div class="form-group">
                         <label>Descrição</label>
@@ -530,7 +527,7 @@
                     </div>
                     <div class="form-group">
                         <label>Quantidade</label>
-                        <input type="number" id="newIngredientQty" placeholder="Quantidade" step="0.01">
+                        <input type="number" id="newIngredientQty" placeholder="0" step="0.01" min="0">
                     </div>
                     <div class="form-group">
                         <label>Unidade</label>
@@ -561,8 +558,8 @@
                         <input type="text" id="expenseDesc" placeholder="Descrição da despesa">
                     </div>
                     <div class="form-group">
-                        <label>Valor</label>
-                        <input type="number" id="expenseValue" placeholder="Valor" step="0.01">
+                        <label>Valor (R$)</label>
+                        <input type="number" id="expenseValue" placeholder="0.00" step="0.01" min="0">
                     </div>
                     <div class="form-group">
                         <label>Categoria</label>
@@ -608,20 +605,13 @@
                     <label>Email</label>
                     <input type="email" id="storeEmail" placeholder="Email">
                 </div>
-                <button class="btn-primary" onclick="salvarConfigurações()">Salvar Configurações</button>
+                <button class="btn-primary" onclick="salvarConfiguracoes()">Salvar Configurações</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Inicializar Supabase
-        const SUPABASE_URL = 'https://nnpifmbfwyraptfksjwo.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ucGlmbWJmd3lyYXB0ZmtzandvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1ODE5NjYsImV4cCI6MjA3NzE1Nzk2Nn0.QTmxkS8DylHG0VIZBsNVsolsgfnImwuu_jmsBp7xR_Q';
-
-        const { createClient } = window.supabase;
-        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // Dados locais
+        // Dados locais com produtos padrão
         let cart = [];
         let products = [
             { id: 1, name: 'Hamburguer Clássico', price: 25.00, description: 'Hamburguer com queijo e alface', category: 'Hamburguer' },
@@ -636,33 +626,8 @@
         let selectedOrderType = 'local';
         let selectedOrigin = 'venda-local';
 
-        // Carregar dados ao iniciar
-        async function loadData() {
-            try {
-                // Carregar produtos
-                const { data: productsData } = await supabase.from('products').select('*');
-                if (productsData && productsData.length > 0) products = productsData;
-                
-                // Carregar clientes
-                const { data: clientsData } = await supabase.from('clients').select('*');
-                if (clientsData) clients = clientsData;
-                
-                // Carregar estoque
-                const { data: inventoryData } = await supabase.from('inventory').select('*');
-                if (inventoryData) inventory = inventoryData;
-                
-                // Carregar despesas
-                const { data: expensesData } = await supabase.from('expenses').select('*');
-                if (expensesData) expenses = expensesData;
-                
-                // Carregar pedidos
-                const { data: ordersData } = await supabase.from('orders').select('*');
-                if (ordersData) orders = ordersData;
-            } catch (error) {
-                console.log('Usando dados locais (Supabase não disponível)');
-                // Usar dados locais se Supabase não estiver disponível
-            }
-
+        // Inicializar ao carregar
+        function init() {
             renderProducts();
             renderProductsList();
             renderClientsList();
@@ -670,34 +635,38 @@
             renderExpenses();
             renderKitchenOrders();
             renderStats();
+            setupEventListeners();
         }
 
-        // Abas
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
-                btn.classList.add('active');
-                document.getElementById(btn.dataset.tab).classList.add('active');
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Abas
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(btn.dataset.tab).classList.add('active');
+                });
             });
-        });
 
-        // Seletores de tipo
-        document.querySelectorAll('.type-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
-                selectedOrderType = btn.dataset.type;
+            // Seletores de tipo
+            document.querySelectorAll('.type-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedOrderType = btn.dataset.type;
+                });
             });
-        });
 
-        document.querySelectorAll('.origin-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.origin-btn').forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
-                selectedOrigin = btn.dataset.origin;
+            document.querySelectorAll('.origin-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.origin-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedOrigin = btn.dataset.origin;
+                });
             });
-        });
+        }
 
         // Renderizar produtos
         function renderProducts() {
@@ -741,7 +710,7 @@
             if (existing) {
                 existing.quantity++;
             } else {
-                cart.push({ id, name, price, quantity: 1 });
+                cart.push({ id, name, price: parseFloat(price), quantity: 1 });
             }
             renderCart();
         }
@@ -758,7 +727,7 @@
                             <div class="cart-item-price">R$ ${(item.price * item.quantity).toFixed(2)}</div>
                         </div>
                         <div class="cart-item-controls">
-                            <input type="number" value="${item.quantity}" onchange="alterarQuantidade(${idx}, this.value)">
+                            <input type="number" value="${item.quantity}" min="1" onchange="alterarQuantidade(${idx}, this.value)">
                             <button class="btn-danger" onclick="removerDoCarrinho(${idx})">✕</button>
                         </div>
                     </div>
@@ -768,8 +737,11 @@
         }
 
         function alterarQuantidade(idx, qty) {
-            cart[idx].quantity = parseInt(qty) || 1;
-            renderCart();
+            const quantidade = parseInt(qty) || 1;
+            if (quantidade > 0) {
+                cart[idx].quantity = quantidade;
+                renderCart();
+            }
         }
 
         function removerDoCarrinho(idx) {
@@ -783,33 +755,27 @@
         }
 
         // Finalizar venda
-        async function finalizarVenda() {
+        function finalizarVenda() {
             if (cart.length === 0) {
                 alert('Carrinho vazio!');
                 return;
             }
 
-            const clientName = document.getElementById('clientName').value || 'Cliente Anônimo';
-            const clientWhatsapp = document.getElementById('clientWhatsapp').value || '';
+            const clientName = document.getElementById('clientName').value.trim() || 'Cliente Anônimo';
+            const clientWhatsapp = document.getElementById('clientWhatsapp').value.trim() || '';
             const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
             const order = {
+                id: Date.now(),
                 client_name: clientName,
                 client_whatsapp: clientWhatsapp,
                 order_type: selectedOrderType,
                 origin: selectedOrigin,
-                items: cart,
+                items: JSON.parse(JSON.stringify(cart)),
                 total: total,
                 status: 'pendente',
                 created_at: new Date().toISOString()
             };
-
-            try {
-                const { error } = await supabase.from('orders').insert([order]);
-                if (error) throw error;
-            } catch (error) {
-                console.log('Salvando localmente');
-            }
 
             orders.push(order);
             cart = [];
@@ -817,14 +783,15 @@
             document.getElementById('clientWhatsapp').value = '';
             renderCart();
             renderKitchenOrders();
+            renderStats();
             alert('Venda finalizada com sucesso!');
         }
 
         // Produtos
-        async function adicionarProduto() {
+        function adicionarProduto() {
             const name = document.getElementById('newProductName').value.trim();
             const price = document.getElementById('newProductPrice').value.trim();
-            const desc = document.getElementById('newProductDesc').value;
+            const desc = document.getElementById('newProductDesc').value.trim();
             const category = document.getElementById('newProductCategory').value;
 
             if (!name || !price) {
@@ -832,22 +799,25 @@
                 return;
             }
 
-            const product = { id: Date.now(), name, price: parseFloat(price), description: desc || 'Sem descricao', category };
-
-            try {
-                const { data } = await supabase.from('products').insert([product]).select();
-                if (data) products.push(data[0]);
-            } catch (error) {
-                console.log('Salvando localmente');
-                product.id = Date.now();
-                products.push(product);
+            const priceNum = parseFloat(price);
+            if (isNaN(priceNum) || priceNum < 0) {
+                alert('Preço inválido');
+                return;
             }
 
+            const product = { 
+                id: Date.now(), 
+                name, 
+                price: priceNum, 
+                description: desc || 'Sem descrição', 
+                category 
+            };
+
+            products.push(product);
             limparFormularioProduto();
             renderProducts();
             renderProductsList();
             alert('Produto adicionado com sucesso!');
-            location.reload();
         }
 
         function limparFormularioProduto() {
@@ -856,44 +826,33 @@
             document.getElementById('newProductDesc').value = '';
         }
 
-        async function deletarProduto(id) {
-            if (!confirm('Deletar produto?')) return;
-            try {
-                await supabase.from('products').delete().eq('id', id);
-            } catch (error) {
-                console.log('Deletando localmente');
+        function deletarProduto(id) {
+            if (confirm('Deletar produto?')) {
+                products = products.filter(p => p.id !== id);
+                renderProducts();
+                renderProductsList();
             }
-            products = products.filter(p => p.id !== id);
-            renderProducts();
-            renderProductsList();
         }
 
         // Clientes
-        async function adicionarCliente() {
-            const name = document.getElementById('newClientName').value;
-            const phone = document.getElementById('newClientPhone').value;
-            const email = document.getElementById('newClientEmail').value;
+        function adicionarCliente() {
+            const name = document.getElementById('newClientName').value.trim();
+            const phone = document.getElementById('newClientPhone').value.trim();
+            const email = document.getElementById('newClientEmail').value.trim();
 
             if (!name) {
                 alert('Preencha o nome');
                 return;
             }
 
-            const client = { name, phone, email };
-
-            try {
-                const { data } = await supabase.from('clients').insert([client]).select();
-                if (data) clients.push(data[0]);
-            } catch (error) {
-                console.log('Salvando localmente');
-                client.id = Date.now();
-                clients.push(client);
-            }
+            const client = { id: Date.now(), name, phone, email };
+            clients.push(client);
 
             document.getElementById('newClientName').value = '';
             document.getElementById('newClientPhone').value = '';
             document.getElementById('newClientEmail').value = '';
             renderClientsList();
+            alert('Cliente adicionado com sucesso!');
         }
 
         function renderClientsList() {
@@ -914,9 +873,9 @@
         }
 
         // Estoque
-        async function adicionarIngrediente() {
-            const name = document.getElementById('newIngredientName').value;
-            const qty = document.getElementById('newIngredientQty').value;
+        function adicionarIngrediente() {
+            const name = document.getElementById('newIngredientName').value.trim();
+            const qty = document.getElementById('newIngredientQty').value.trim();
             const unit = document.getElementById('newIngredientUnit').value;
 
             if (!name || !qty) {
@@ -924,20 +883,19 @@
                 return;
             }
 
-            const ingredient = { name, quantity: parseFloat(qty), unit };
-
-            try {
-                const { data } = await supabase.from('inventory').insert([ingredient]).select();
-                if (data) inventory.push(data[0]);
-            } catch (error) {
-                console.log('Salvando localmente');
-                ingredient.id = Date.now();
-                inventory.push(ingredient);
+            const qtyNum = parseFloat(qty);
+            if (isNaN(qtyNum) || qtyNum < 0) {
+                alert('Quantidade inválida');
+                return;
             }
+
+            const ingredient = { id: Date.now(), name, quantity: qtyNum, unit };
+            inventory.push(ingredient);
 
             document.getElementById('newIngredientName').value = '';
             document.getElementById('newIngredientQty').value = '';
             renderInventory();
+            alert('Ingrediente adicionado com sucesso!');
         }
 
         function renderInventory() {
@@ -958,9 +916,9 @@
         }
 
         // Despesas
-        async function adicionarDespesa() {
-            const desc = document.getElementById('expenseDesc').value;
-            const value = document.getElementById('expenseValue').value;
+        function adicionarDespesa() {
+            const desc = document.getElementById('expenseDesc').value.trim();
+            const value = document.getElementById('expenseValue').value.trim();
             const category = document.getElementById('expenseCategory').value;
 
             if (!desc || !value) {
@@ -968,20 +926,20 @@
                 return;
             }
 
-            const expense = { description: desc, value: parseFloat(value), category, created_at: new Date().toISOString() };
-
-            try {
-                const { data } = await supabase.from('expenses').insert([expense]).select();
-                if (data) expenses.push(data[0]);
-            } catch (error) {
-                console.log('Salvando localmente');
-                expense.id = Date.now();
-                expenses.push(expense);
+            const valueNum = parseFloat(value);
+            if (isNaN(valueNum) || valueNum < 0) {
+                alert('Valor inválido');
+                return;
             }
+
+            const expense = { id: Date.now(), description: desc, value: valueNum, category, created_at: new Date().toISOString() };
+            expenses.push(expense);
 
             document.getElementById('expenseDesc').value = '';
             document.getElementById('expenseValue').value = '';
             renderExpenses();
+            renderStats();
+            alert('Despesa registrada com sucesso!');
         }
 
         function renderExpenses() {
@@ -1022,15 +980,16 @@
                         <p>${order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</p>
                     </div>
                     <div class="list-item-actions">
-                        <button class="btn-primary" onclick="marcarPronto(${idx})">Pronto</button>
+                        <button class="btn-primary" onclick="marcarPronto('${order.id}')">Pronto</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        function marcarPronto(idx) {
-            if (orders[idx]) {
-                orders[idx].status = 'pronto';
+        function marcarPronto(orderId) {
+            const order = orders.find(o => o.id == orderId);
+            if (order) {
+                order.status = 'pronto';
                 renderKitchenOrders();
             }
         }
@@ -1081,10 +1040,10 @@
         }
 
         // Configurações
-        function salvarConfigurações() {
-            const storeName = document.getElementById('storeName').value;
-            const storePhone = document.getElementById('storePhone').value;
-            const storeEmail = document.getElementById('storeEmail').value;
+        function salvarConfiguracoes() {
+            const storeName = document.getElementById('storeName').value.trim();
+            const storePhone = document.getElementById('storePhone').value.trim();
+            const storeEmail = document.getElementById('storeEmail').value.trim();
 
             localStorage.setItem('storeName', storeName);
             localStorage.setItem('storePhone', storePhone);
@@ -1093,8 +1052,8 @@
             alert('Configurações salvas!');
         }
 
-        // Carregar dados ao iniciar
-        loadData();
+        // Inicializar
+        init();
     </script>
 </body>
 </html>
