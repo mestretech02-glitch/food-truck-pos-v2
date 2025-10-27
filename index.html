@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Food Truck Manager</title>
+    <title>Food Truck Manager Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -32,6 +34,14 @@
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        .customer-counter {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
         }
 
         .nav-tabs {
@@ -118,19 +128,7 @@
             font-family: inherit;
         }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
         button {
-            flex: 1;
             padding: 12px;
             border: none;
             border-radius: 5px;
@@ -156,25 +154,9 @@
             border: 2px solid #ff6b35;
         }
 
-        .btn-secondary:hover {
-            background: #ff6b35;
-            color: white;
-        }
-
         .btn-danger {
             background: #d32f2f;
             color: white;
-        }
-
-        .btn-danger:hover {
-            background: #b71c1c;
-        }
-
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
         }
 
         .product-card {
@@ -182,9 +164,9 @@
             border: 2px solid #ff6b35;
             border-radius: 8px;
             padding: 15px;
-            text-align: center;
             cursor: pointer;
             transition: all 0.3s;
+            margin-bottom: 15px;
         }
 
         .product-card:hover {
@@ -195,13 +177,11 @@
 
         .product-card h3 {
             color: #ff6b35;
-            font-size: 16px;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .product-card .price {
             color: #4caf50;
-            font-size: 18px;
             font-weight: bold;
         }
 
@@ -210,127 +190,152 @@
             color: white;
         }
 
-        .cart-item {
-            background: #1a1a2e;
-            border-left: 4px solid #ff6b35;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 5px;
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal.active {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: center;
         }
 
-        .cart-item-info {
-            flex: 1;
+        .modal-content {
+            background: #0f3460;
+            border: 3px solid #ff6b35;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        .cart-item-name {
+        .modal-content h2 {
             color: #ff6b35;
-            font-weight: bold;
+            margin-bottom: 20px;
         }
 
-        .cart-item-price {
-            color: #4caf50;
+        .option-group {
+            margin-bottom: 20px;
         }
 
-        .cart-item-controls {
+        .option-group label {
             display: flex;
-            gap: 5px;
             align-items: center;
-        }
-
-        .cart-item-controls input {
-            width: 50px;
-            padding: 5px;
-            background: #0f3460;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 10px;
+            background: #1a1a2e;
+            border-radius: 5px;
             border: 1px solid #ff6b35;
-            border-radius: 3px;
-            color: white;
-            text-align: center;
         }
 
-        .cart-item-controls button {
-            padding: 5px 10px;
-            font-size: 12px;
+        .option-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
         }
 
-        .cart-total {
-            background: #0f3460;
-            border: 2px solid #4caf50;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: right;
-            margin: 20px 0;
-        }
-
-        .cart-total h3 {
-            color: #4caf50;
-            font-size: 24px;
-        }
-
-        .type-selector {
+        .payment-options {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-bottom: 15px;
+            margin: 20px 0;
         }
 
-        .type-selector button {
-            padding: 10px;
-            background: #0f3460;
+        .payment-btn {
+            padding: 15px;
             border: 2px solid #ff6b35;
+            background: #1a1a2e;
             color: #ff6b35;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: bold;
             transition: all 0.3s;
         }
 
-        .type-selector button.selected {
+        .payment-btn:hover {
             background: #ff6b35;
             color: white;
         }
 
-        .list-item {
+        .kitchen-card {
             background: #1a1a2e;
-            border-left: 4px solid #ff6b35;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border: 3px solid #ff6b35;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
         }
 
-        .list-item-info h3 {
+        .kitchen-card.ready {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .customer-number {
+            font-size: 32px;
+            font-weight: bold;
             color: #ff6b35;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
 
-        .list-item-info p {
+        .timer {
+            font-size: 24px;
+            color: #ff6b35;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .kitchen-items {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .kitchen-items p {
+            margin: 5px 0;
             color: #ccc;
-            font-size: 14px;
         }
 
-        .list-item-actions {
+        .kitchen-actions {
             display: flex;
             gap: 10px;
+            margin-top: 15px;
         }
 
-        .list-item-actions button {
-            padding: 8px 12px;
-            font-size: 12px;
+        .kitchen-actions button {
+            flex: 1;
+            padding: 10px;
         }
 
-        .empty-state {
+        .delivery-board {
+            background: #0f3460;
+            border: 2px solid #4caf50;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
             text-align: center;
-            padding: 40px;
-            color: #999;
         }
 
-        .empty-state-icon {
-            font-size: 48px;
+        .delivery-board h3 {
+            color: #4caf50;
+            font-size: 24px;
             margin-bottom: 10px;
+        }
+
+        .delivery-number {
+            font-size: 48px;
+            color: #4caf50;
+            font-weight: bold;
         }
 
         .stats-grid {
@@ -359,6 +364,20 @@
             font-weight: bold;
         }
 
+        .list-item {
+            background: #1a1a2e;
+            border-left: 4px solid #ff6b35;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
         @media (max-width: 768px) {
             .two-column {
                 grid-template-columns: 1fr;
@@ -372,24 +391,22 @@
                 width: 100%;
             }
 
-            .product-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            .payment-options {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>🍔 Food Truck Manager</h1>
+        <h1>🍔 Food Truck Manager Pro</h1>
+        <div class="customer-counter">Cliente #<span id="customerNumber">1</span></div>
         <div class="nav-tabs">
             <button class="tab-btn active" data-tab="vendas">Vendas</button>
             <button class="tab-btn" data-tab="cozinha">👨‍🍳 Cozinha</button>
-            <button class="tab-btn" data-tab="clientes">👥 Clientes</button>
-            <button class="tab-btn" data-tab="produtos">🍽️ Produtos</button>
+            <button class="tab-btn" data-tab="entrega">📦 Entrega</button>
             <button class="tab-btn" data-tab="estoque">📦 Estoque</button>
-            <button class="tab-btn" data-tab="despesas">💰 Despesas</button>
             <button class="tab-btn" data-tab="relatorios">📈 Relatórios</button>
-            <button class="tab-btn" data-tab="configuracoes">⚙️ Configurações</button>
         </div>
     </div>
 
@@ -398,46 +415,17 @@
         <div id="vendas" class="content active">
             <div class="two-column">
                 <div class="card">
-                    <h2>🍽️ Produtos Disponíveis</h2>
-                    <div id="productsList" class="product-grid"></div>
+                    <h2>🍽️ Produtos</h2>
+                    <div id="productsList"></div>
                 </div>
 
                 <div class="card">
-                    <h2>🛒 Carrinho de Compras</h2>
-                    
-                    <div class="form-group">
-                        <label>Tipo de Pedido</label>
-                        <div class="type-selector">
-                            <button class="type-btn" data-type="para-viagem">Para Viagem</button>
-                            <button class="type-btn selected" data-type="local">Local</button>
-                        </div>
+                    <h2>🛒 Carrinho</h2>
+                    <div id="cartItems" style="max-height: 400px; overflow-y: auto;"></div>
+                    <div style="background: #0f3460; border: 2px solid #4caf50; padding: 15px; border-radius: 8px; text-align: right; margin: 20px 0;">
+                        <h3 style="color: #4caf50; font-size: 24px;">Total: R$ <span id="cartTotal">0.00</span></h3>
                     </div>
-
-                    <div class="form-group">
-                        <label>Origem</label>
-                        <div class="type-selector">
-                            <button class="origin-btn selected" data-origin="venda-local">Venda Local</button>
-                            <button class="origin-btn" data-origin="ifoods">iFoods</button>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Nome do Cliente</label>
-                        <input type="text" id="clientName" placeholder="Buscar ou Adicionar Cliente">
-                    </div>
-
-                    <div class="form-group">
-                        <label>WhatsApp (Opcional)</label>
-                        <input type="text" id="clientWhatsapp" placeholder="Número do WhatsApp">
-                    </div>
-
-                    <div id="cartItems" style="max-height: 300px; overflow-y: auto;"></div>
-
-                    <div class="cart-total">
-                        <h3>Total: R$ <span id="cartTotal">0.00</span></h3>
-                    </div>
-
-                    <button class="btn-primary" onclick="finalizarVenda()">✓ Finalizar Venda</button>
+                    <button class="btn-primary" style="width: 100%;" onclick="abrirPagamento()">Finalizar Venda</button>
                 </div>
             </div>
         </div>
@@ -445,74 +433,16 @@
         <!-- ABA COZINHA -->
         <div id="cozinha" class="content">
             <div class="card">
-                <h2>👨‍🍳 Pedidos Pendentes</h2>
+                <h2>👨‍🍳 Pedidos na Cozinha</h2>
                 <div id="kitchenOrders"></div>
             </div>
         </div>
 
-        <!-- ABA CLIENTES -->
-        <div id="clientes" class="content">
-            <div class="two-column">
-                <div class="card">
-                    <h2>Novo Cliente</h2>
-                    <div class="form-group">
-                        <label>Nome</label>
-                        <input type="text" id="newClientName" placeholder="Nome do cliente">
-                    </div>
-                    <div class="form-group">
-                        <label>Telefone</label>
-                        <input type="text" id="newClientPhone" placeholder="Telefone">
-                    </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="newClientEmail" placeholder="Email">
-                    </div>
-                    <button class="btn-primary" onclick="adicionarCliente()">Adicionar Cliente</button>
-                </div>
-
-                <div class="card">
-                    <h2>Lista de Clientes</h2>
-                    <div id="clientsList"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ABA PRODUTOS -->
-        <div id="produtos" class="content">
-            <div class="two-column">
-                <div class="card">
-                    <h2>Novo Produto</h2>
-                    <div class="form-group">
-                        <label>Nome</label>
-                        <input type="text" id="newProductName" placeholder="Nome do produto">
-                    </div>
-                    <div class="form-group">
-                        <label>Preço (R$)</label>
-                        <input type="number" id="newProductPrice" placeholder="0.00" step="0.01" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label>Descrição</label>
-                        <textarea id="newProductDesc" placeholder="Descrição"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Categoria</label>
-                        <select id="newProductCategory">
-                            <option value="Hamburguer">Hamburguer</option>
-                            <option value="Bebida">Bebida</option>
-                            <option value="Acompanhamento">Acompanhamento</option>
-                            <option value="Sobremesa">Sobremesa</option>
-                        </select>
-                    </div>
-                    <div class="button-group">
-                        <button class="btn-primary" onclick="adicionarProduto()">Salvar</button>
-                        <button class="btn-secondary" onclick="limparFormularioProduto()">Cancelar</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>Lista de Produtos</h2>
-                    <div id="productsList2"></div>
-                </div>
+        <!-- ABA ENTREGA -->
+        <div id="entrega" class="content">
+            <div class="card">
+                <h2>📦 Clientes Aguardando Entrega</h2>
+                <div id="deliveryBoard"></div>
             </div>
         </div>
 
@@ -523,22 +453,17 @@
                     <h2>Novo Ingrediente</h2>
                     <div class="form-group">
                         <label>Nome</label>
-                        <input type="text" id="newIngredientName" placeholder="Nome do ingrediente">
+                        <input type="text" id="ingredientName" placeholder="Nome do ingrediente">
                     </div>
                     <div class="form-group">
                         <label>Quantidade</label>
-                        <input type="number" id="newIngredientQty" placeholder="0" step="0.01" min="0">
+                        <input type="number" id="ingredientQty" placeholder="0" step="0.01" min="0">
                     </div>
                     <div class="form-group">
-                        <label>Unidade</label>
-                        <select id="newIngredientUnit">
-                            <option value="kg">kg</option>
-                            <option value="L">L</option>
-                            <option value="un">un</option>
-                            <option value="g">g</option>
-                        </select>
+                        <label>Custo Unitário (R$)</label>
+                        <input type="number" id="ingredientCost" placeholder="0.00" step="0.01" min="0">
                     </div>
-                    <button class="btn-primary" onclick="adicionarIngrediente()">Adicionar</button>
+                    <button class="btn-primary" style="width: 100%;" onclick="adicionarIngrediente()">Adicionar</button>
                 </div>
 
                 <div class="card">
@@ -548,99 +473,94 @@
             </div>
         </div>
 
-        <!-- ABA DESPESAS -->
-        <div id="despesas" class="content">
-            <div class="two-column">
-                <div class="card">
-                    <h2>Nova Despesa</h2>
-                    <div class="form-group">
-                        <label>Descrição</label>
-                        <input type="text" id="expenseDesc" placeholder="Descrição da despesa">
-                    </div>
-                    <div class="form-group">
-                        <label>Valor (R$)</label>
-                        <input type="number" id="expenseValue" placeholder="0.00" step="0.01" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label>Categoria</label>
-                        <select id="expenseCategory">
-                            <option value="Alimentos">Alimentos</option>
-                            <option value="Combustível">Combustível</option>
-                            <option value="Manutenção">Manutenção</option>
-                            <option value="Outros">Outros</option>
-                        </select>
-                    </div>
-                    <button class="btn-primary" onclick="adicionarDespesa()">Registrar</button>
-                </div>
-
-                <div class="card">
-                    <h2>Despesas do Dia</h2>
-                    <div id="expensesList"></div>
-                </div>
-            </div>
-        </div>
-
         <!-- ABA RELATÓRIOS -->
         <div id="relatorios" class="content">
-            <div class="stats-grid" id="statsGrid"></div>
             <div class="card">
-                <h2>Vendas do Dia</h2>
-                <div id="salesList"></div>
+                <h2>📈 Relatórios do Dia</h2>
+                <div class="stats-grid" id="statsGrid"></div>
+                <div style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button class="btn-primary" onclick="exportarPDF()">📄 Exportar PDF</button>
+                    <button class="btn-primary" onclick="exportarExcel()">📊 Exportar Excel</button>
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- ABA CONFIGURAÇÕES -->
-        <div id="configuracoes" class="content">
-            <div class="card">
-                <h2>Configurações da Loja</h2>
-                <div class="form-group">
-                    <label>Nome da Loja</label>
-                    <input type="text" id="storeName" placeholder="Nome da loja">
-                </div>
-                <div class="form-group">
-                    <label>Telefone</label>
-                    <input type="text" id="storePhone" placeholder="Telefone">
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="storeEmail" placeholder="Email">
-                </div>
-                <button class="btn-primary" onclick="salvarConfiguracoes()">Salvar Configurações</button>
+    <!-- MODAL PAGAMENTO -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <h2>Escolha a Forma de Pagamento</h2>
+            <div class="payment-options">
+                <button class="payment-btn" onclick="finalizarVenda('dinheiro')">💵 Dinheiro</button>
+                <button class="payment-btn" onclick="finalizarVenda('debito')">🏧 Débito</button>
+                <button class="payment-btn" onclick="finalizarVenda('credito')">💳 Crédito</button>
+                <button class="payment-btn" onclick="finalizarVenda('pix')">📱 PIX</button>
+            </div>
+            <button class="btn-secondary" style="width: 100%; margin-top: 20px;" onclick="fecharPagamento()">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- MODAL OPÇÕES PRODUTO -->
+    <div id="optionsModal" class="modal">
+        <div class="modal-content">
+            <h2 id="optionProductName"></h2>
+            <div id="optionsContainer"></div>
+            <div style="margin-top: 20px;">
+                <button class="btn-primary" style="width: 100%;" onclick="confirmarOpcoes()">Adicionar ao Carrinho</button>
+                <button class="btn-secondary" style="width: 100%; margin-top: 10px;" onclick="fecharOpcoes()">Cancelar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Dados locais com produtos padrão
         let cart = [];
-        let products = [
-            { id: 1, name: 'Hamburguer Clássico', price: 25.00, description: 'Hamburguer com queijo e alface', category: 'Hamburguer' },
-            { id: 2, name: 'Hamburguer Especial', price: 35.00, description: 'Hamburguer com bacon e ovo', category: 'Hamburguer' },
-            { id: 3, name: 'Refrigerante 2L', price: 12.00, description: 'Refrigerante gelado', category: 'Bebida' },
-            { id: 4, name: 'Água 500ml', price: 3.00, description: 'Água mineral', category: 'Bebida' }
-        ];
-        let clients = [];
+        let products = [];
         let inventory = [];
-        let expenses = [];
         let orders = [];
-        let selectedOrderType = 'local';
-        let selectedOrigin = 'venda-local';
+        let deliveryOrders = [];
+        let customerCount = 1;
+        let selectedProduct = null;
+        let selectedOptions = {};
 
-        // Inicializar ao carregar
+        // Produtos padrão com opções
+        const defaultProducts = [
+            {
+                id: 1,
+                name: 'Hamburguer Clássico',
+                price: 25.00,
+                category: 'Hamburguer',
+                ingredients: [{ name: 'Pão', qty: 1 }, { name: 'Carne', qty: 100 }, { name: 'Alface', qty: 20 }],
+                options: [
+                    { name: 'Sem Maionese', price: 0 },
+                    { name: 'Com Farinha', price: 2 },
+                    { name: 'Sem Queijo', price: -3 },
+                    { name: 'Queijo Extra', price: 5 }
+                ]
+            },
+            {
+                id: 2,
+                name: 'Hamburguer Especial',
+                price: 35.00,
+                category: 'Hamburguer',
+                ingredients: [{ name: 'Pão', qty: 1 }, { name: 'Carne', qty: 150 }, { name: 'Bacon', qty: 30 }],
+                options: [
+                    { name: 'Sem Maionese', price: 0 },
+                    { name: 'Com Farinha', price: 2 },
+                    { name: 'Sem Queijo', price: -3 },
+                    { name: 'Queijo Extra', price: 5 }
+                ]
+            }
+        ];
+
         function init() {
+            products = JSON.parse(JSON.stringify(defaultProducts));
             renderProducts();
-            renderProductsList();
-            renderClientsList();
             renderInventory();
-            renderExpenses();
-            renderKitchenOrders();
-            renderStats();
             setupEventListeners();
+            atualizarStats();
         }
 
-        // Configurar event listeners
         function setupEventListeners() {
-            // Abas
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -649,86 +569,89 @@
                     document.getElementById(btn.dataset.tab).classList.add('active');
                 });
             });
-
-            // Seletores de tipo
-            document.querySelectorAll('.type-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
-                    btn.classList.add('selected');
-                    selectedOrderType = btn.dataset.type;
-                });
-            });
-
-            document.querySelectorAll('.origin-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.origin-btn').forEach(b => b.classList.remove('selected'));
-                    btn.classList.add('selected');
-                    selectedOrigin = btn.dataset.origin;
-                });
-            });
         }
 
-        // Renderizar produtos
         function renderProducts() {
             const list = document.getElementById('productsList');
-            if (products.length === 0) {
-                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div>Nenhum produto cadastrado</div>';
-                return;
-            }
-
             list.innerHTML = products.map(p => `
-                <div class="product-card" onclick="adicionarAoCarrinho(${p.id}, '${p.name}', ${p.price})">
+                <div class="product-card" onclick="abrirOpcoes(${p.id}, '${p.name}', ${p.price})">
                     <h3>${p.name}</h3>
-                    <p class="price">R$ ${parseFloat(p.price).toFixed(2)}</p>
+                    <p>R$ ${parseFloat(p.price).toFixed(2)}</p>
                 </div>
             `).join('');
         }
 
-        function renderProductsList() {
-            const list = document.getElementById('productsList2');
-            if (products.length === 0) {
-                list.innerHTML = '<div class="empty-state">Nenhum produto cadastrado</div>';
-                return;
-            }
-
-            list.innerHTML = products.map(p => `
-                <div class="list-item">
-                    <div class="list-item-info">
-                        <h3>${p.name}</h3>
-                        <p>R$ ${parseFloat(p.price).toFixed(2)}</p>
+        function abrirOpcoes(id, name, price) {
+            selectedProduct = { id, name, price };
+            const product = products.find(p => p.id === id);
+            
+            document.getElementById('optionProductName').textContent = name;
+            const container = document.getElementById('optionsContainer');
+            
+            if (product.options && product.options.length > 0) {
+                container.innerHTML = product.options.map(opt => `
+                    <div class="option-group">
+                        <label>
+                            <input type="checkbox" value="${opt.name}" data-price="${opt.price}" onchange="atualizarOpcoes()">
+                            ${opt.name} ${opt.price > 0 ? `(+R$ ${opt.price.toFixed(2)})` : opt.price < 0 ? `(-R$ ${Math.abs(opt.price).toFixed(2)})` : ''}
+                        </label>
                     </div>
-                    <div class="list-item-actions">
-                        <button class="btn-danger" onclick="deletarProduto(${p.id})">Deletar</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Adicionar ao carrinho
-        function adicionarAoCarrinho(id, name, price) {
-            const existing = cart.find(item => item.id === id);
-            if (existing) {
-                existing.quantity++;
+                `).join('');
             } else {
-                cart.push({ id, name, price: parseFloat(price), quantity: 1 });
+                container.innerHTML = '<p style="color: #999;">Sem opções adicionais</p>';
             }
+            
+            selectedOptions = {};
+            document.getElementById('optionsModal').classList.add('active');
+        }
+
+        function atualizarOpcoes() {
+            selectedOptions = {};
+            let priceAdjustment = 0;
+            
+            document.querySelectorAll('#optionsContainer input[type="checkbox"]:checked').forEach(cb => {
+                selectedOptions[cb.value] = true;
+                priceAdjustment += parseFloat(cb.dataset.price);
+            });
+            
+            selectedProduct.finalPrice = selectedProduct.price + priceAdjustment;
+        }
+
+        function confirmarOpcoes() {
+            atualizarOpcoes();
+            const item = {
+                id: Date.now(),
+                productId: selectedProduct.id,
+                name: selectedProduct.name,
+                price: selectedProduct.finalPrice || selectedProduct.price,
+                options: Object.keys(selectedOptions),
+                quantity: 1
+            };
+            
+            cart.push(item);
             renderCart();
+            fecharOpcoes();
+        }
+
+        function fecharOpcoes() {
+            document.getElementById('optionsModal').classList.remove('active');
         }
 
         function renderCart() {
             const cartDiv = document.getElementById('cartItems');
             if (cart.length === 0) {
-                cartDiv.innerHTML = '<p style="text-align: center; color: #999;">Selecione produtos para adicionar ao carrinho.</p>';
+                cartDiv.innerHTML = '<p style="text-align: center; color: #999;">Carrinho vazio</p>';
             } else {
                 cartDiv.innerHTML = cart.map((item, idx) => `
-                    <div class="cart-item">
-                        <div class="cart-item-info">
-                            <div class="cart-item-name">${item.name}</div>
-                            <div class="cart-item-price">R$ ${(item.price * item.quantity).toFixed(2)}</div>
+                    <div class="list-item">
+                        <div style="flex: 1;">
+                            <strong>${item.name}</strong>
+                            ${item.options.length > 0 ? `<p style="font-size: 12px; color: #999;">${item.options.join(', ')}</p>` : ''}
+                            <p style="color: #4caf50; margin-top: 5px;">R$ ${(item.price * item.quantity).toFixed(2)}</p>
                         </div>
-                        <div class="cart-item-controls">
-                            <input type="number" value="${item.quantity}" min="1" onchange="alterarQuantidade(${idx}, this.value)">
-                            <button class="btn-danger" onclick="removerDoCarrinho(${idx})">✕</button>
+                        <div style="display: flex; gap: 5px; align-items: center;">
+                            <input type="number" value="${item.quantity}" min="1" style="width: 50px;" onchange="alterarQtd(${idx}, this.value)">
+                            <button class="btn-danger" style="padding: 5px 10px;" onclick="removerCart(${idx})">✕</button>
                         </div>
                     </div>
                 `).join('');
@@ -736,15 +659,15 @@
             atualizarTotal();
         }
 
-        function alterarQuantidade(idx, qty) {
-            const quantidade = parseInt(qty) || 1;
-            if (quantidade > 0) {
-                cart[idx].quantity = quantidade;
+        function alterarQtd(idx, qty) {
+            const q = parseInt(qty) || 1;
+            if (q > 0) {
+                cart[idx].quantity = q;
                 renderCart();
             }
         }
 
-        function removerDoCarrinho(idx) {
+        function removerCart(idx) {
             cart.splice(idx, 1);
             renderCart();
         }
@@ -754,306 +677,236 @@
             document.getElementById('cartTotal').textContent = total.toFixed(2);
         }
 
-        // Finalizar venda
-        function finalizarVenda() {
+        function abrirPagamento() {
             if (cart.length === 0) {
                 alert('Carrinho vazio!');
                 return;
             }
+            document.getElementById('paymentModal').classList.add('active');
+        }
 
-            const clientName = document.getElementById('clientName').value.trim() || 'Cliente Anônimo';
-            const clientWhatsapp = document.getElementById('clientWhatsapp').value.trim() || '';
+        function fecharPagamento() {
+            document.getElementById('paymentModal').classList.remove('active');
+        }
+
+        function finalizarVenda(paymentMethod) {
             const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
+            
             const order = {
-                id: Date.now(),
-                client_name: clientName,
-                client_whatsapp: clientWhatsapp,
-                order_type: selectedOrderType,
-                origin: selectedOrigin,
+                id: customerCount,
                 items: JSON.parse(JSON.stringify(cart)),
                 total: total,
+                paymentMethod: paymentMethod,
                 status: 'pendente',
-                created_at: new Date().toISOString()
+                createdAt: new Date(),
+                startTime: Date.now()
             };
 
             orders.push(order);
+            deliveryOrders.push({ id: customerCount, status: 'pronto', createdAt: new Date() });
+            
             cart = [];
-            document.getElementById('clientName').value = '';
-            document.getElementById('clientWhatsapp').value = '';
+            customerCount++;
+            document.getElementById('customerNumber').textContent = customerCount;
+            
             renderCart();
             renderKitchenOrders();
-            renderStats();
-            alert('Venda finalizada com sucesso!');
+            renderDeliveryBoard();
+            fecharPagamento();
+            atualizarStats();
+            
+            alert(`Pedido #${order.id} enviado para cozinha!`);
         }
 
-        // Produtos
-        function adicionarProduto() {
-            const name = document.getElementById('newProductName').value.trim();
-            const price = document.getElementById('newProductPrice').value.trim();
-            const desc = document.getElementById('newProductDesc').value.trim();
-            const category = document.getElementById('newProductCategory').value;
-
-            if (!name || !price) {
-                alert('Preencha os campos obrigatórios');
+        function renderKitchenOrders() {
+            const list = document.getElementById('kitchenOrders');
+            const pendingOrders = orders.filter(o => o.status === 'pendente');
+            
+            if (pendingOrders.length === 0) {
+                list.innerHTML = '<div class="empty-state">Nenhum pedido pendente</div>';
                 return;
             }
 
-            const priceNum = parseFloat(price);
-            if (isNaN(priceNum) || priceNum < 0) {
-                alert('Preço inválido');
+            list.innerHTML = pendingOrders.map(order => {
+                const elapsed = Math.floor((Date.now() - order.startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                
+                return `
+                    <div class="kitchen-card">
+                        <div class="customer-number">Cliente #${order.id}</div>
+                        <div class="timer">${minutes}:${seconds.toString().padStart(2, '0')}</div>
+                        <div class="kitchen-items">
+                            ${order.items.map(item => `
+                                <p>• ${item.quantity}x ${item.name}</p>
+                                ${item.options.length > 0 ? `<p style="font-size: 12px; margin-left: 20px; color: #999;">${item.options.join(', ')}</p>` : ''}
+                            `).join('')}
+                        </div>
+                        <div class="kitchen-actions">
+                            <button class="btn-primary" onclick="marcarPronto(${order.id})">✓ Pronto</button>
+                            <button class="btn-danger" onclick="cancelarPedido(${order.id})">✕ Cancelar</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Atualizar timers a cada segundo
+            setTimeout(renderKitchenOrders, 1000);
+        }
+
+        function marcarPronto(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = 'pronto';
+                renderKitchenOrders();
+                renderDeliveryBoard();
+            }
+        }
+
+        function cancelarPedido(orderId) {
+            if (confirm('Cancelar pedido?')) {
+                orders = orders.filter(o => o.id !== orderId);
+                deliveryOrders = deliveryOrders.filter(d => d.id !== orderId);
+                renderKitchenOrders();
+                renderDeliveryBoard();
+                atualizarStats();
+            }
+        }
+
+        function renderDeliveryBoard() {
+            const list = document.getElementById('deliveryBoard');
+            const readyOrders = orders.filter(o => o.status === 'pronto');
+            
+            if (readyOrders.length === 0) {
+                list.innerHTML = '<div class="empty-state">Nenhum pedido pronto</div>';
                 return;
             }
 
-            const product = { 
-                id: Date.now(), 
-                name, 
-                price: priceNum, 
-                description: desc || 'Sem descrição', 
-                category 
-            };
-
-            products.push(product);
-            limparFormularioProduto();
-            renderProducts();
-            renderProductsList();
-            alert('Produto adicionado com sucesso!');
+            list.innerHTML = readyOrders.map(order => `
+                <div class="delivery-board">
+                    <h3>Pedido Pronto!</h3>
+                    <div class="delivery-number">#${order.id}</div>
+                    <button class="btn-primary" style="margin-top: 15px;" onclick="entregarPedido(${order.id})">Entregar</button>
+                </div>
+            `).join('');
         }
 
-        function limparFormularioProduto() {
-            document.getElementById('newProductName').value = '';
-            document.getElementById('newProductPrice').value = '';
-            document.getElementById('newProductDesc').value = '';
+        function entregarPedido(orderId) {
+            orders = orders.filter(o => o.id !== orderId);
+            deliveryOrders = deliveryOrders.filter(d => d.id !== orderId);
+            renderDeliveryBoard();
+            renderKitchenOrders();
+            atualizarStats();
         }
 
-        function deletarProduto(id) {
-            if (confirm('Deletar produto?')) {
-                products = products.filter(p => p.id !== id);
-                renderProducts();
-                renderProductsList();
-            }
-        }
-
-        // Clientes
-        function adicionarCliente() {
-            const name = document.getElementById('newClientName').value.trim();
-            const phone = document.getElementById('newClientPhone').value.trim();
-            const email = document.getElementById('newClientEmail').value.trim();
+        function adicionarIngrediente() {
+            const name = document.getElementById('ingredientName').value.trim();
+            const qty = parseFloat(document.getElementById('ingredientQty').value) || 0;
+            const cost = parseFloat(document.getElementById('ingredientCost').value) || 0;
 
             if (!name) {
                 alert('Preencha o nome');
                 return;
             }
 
-            const client = { id: Date.now(), name, phone, email };
-            clients.push(client);
+            inventory.push({
+                id: Date.now(),
+                name,
+                quantity: qty,
+                cost: cost,
+                totalCost: qty * cost
+            });
 
-            document.getElementById('newClientName').value = '';
-            document.getElementById('newClientPhone').value = '';
-            document.getElementById('newClientEmail').value = '';
-            renderClientsList();
-            alert('Cliente adicionado com sucesso!');
-        }
-
-        function renderClientsList() {
-            const list = document.getElementById('clientsList');
-            if (clients.length === 0) {
-                list.innerHTML = '<div class="empty-state">Nenhum cliente cadastrado</div>';
-                return;
-            }
-
-            list.innerHTML = clients.map(c => `
-                <div class="list-item">
-                    <div class="list-item-info">
-                        <h3>${c.name}</h3>
-                        <p>${c.phone || 'Sem telefone'}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Estoque
-        function adicionarIngrediente() {
-            const name = document.getElementById('newIngredientName').value.trim();
-            const qty = document.getElementById('newIngredientQty').value.trim();
-            const unit = document.getElementById('newIngredientUnit').value;
-
-            if (!name || !qty) {
-                alert('Preencha os campos');
-                return;
-            }
-
-            const qtyNum = parseFloat(qty);
-            if (isNaN(qtyNum) || qtyNum < 0) {
-                alert('Quantidade inválida');
-                return;
-            }
-
-            const ingredient = { id: Date.now(), name, quantity: qtyNum, unit };
-            inventory.push(ingredient);
-
-            document.getElementById('newIngredientName').value = '';
-            document.getElementById('newIngredientQty').value = '';
+            document.getElementById('ingredientName').value = '';
+            document.getElementById('ingredientQty').value = '';
+            document.getElementById('ingredientCost').value = '';
             renderInventory();
-            alert('Ingrediente adicionado com sucesso!');
         }
 
         function renderInventory() {
             const list = document.getElementById('inventoryList');
             if (inventory.length === 0) {
-                list.innerHTML = '<div class="empty-state">Nenhum ingrediente cadastrado</div>';
+                list.innerHTML = '<div class="empty-state">Nenhum ingrediente</div>';
                 return;
             }
 
-            list.innerHTML = inventory.map(i => `
+            list.innerHTML = inventory.map(ing => `
                 <div class="list-item">
-                    <div class="list-item-info">
-                        <h3>${i.name}</h3>
-                        <p>${i.quantity} ${i.unit}</p>
+                    <div>
+                        <strong>${ing.name}</strong>
+                        <p style="color: #999; font-size: 12px;">Qtd: ${ing.quantity} | Custo Unit: R$ ${ing.cost.toFixed(2)} | Total: R$ ${ing.totalCost.toFixed(2)}</p>
                     </div>
                 </div>
             `).join('');
         }
 
-        // Despesas
-        function adicionarDespesa() {
-            const desc = document.getElementById('expenseDesc').value.trim();
-            const value = document.getElementById('expenseValue').value.trim();
-            const category = document.getElementById('expenseCategory').value;
-
-            if (!desc || !value) {
-                alert('Preencha os campos');
-                return;
-            }
-
-            const valueNum = parseFloat(value);
-            if (isNaN(valueNum) || valueNum < 0) {
-                alert('Valor inválido');
-                return;
-            }
-
-            const expense = { id: Date.now(), description: desc, value: valueNum, category, created_at: new Date().toISOString() };
-            expenses.push(expense);
-
-            document.getElementById('expenseDesc').value = '';
-            document.getElementById('expenseValue').value = '';
-            renderExpenses();
-            renderStats();
-            alert('Despesa registrada com sucesso!');
-        }
-
-        function renderExpenses() {
-            const list = document.getElementById('expensesList');
+        function atualizarStats() {
             const today = new Date().toDateString();
-            const todayExpenses = expenses.filter(e => new Date(e.created_at).toDateString() === today);
-
-            if (todayExpenses.length === 0) {
-                list.innerHTML = '<div class="empty-state">Nenhuma despesa registrada</div>';
-                return;
-            }
-
-            list.innerHTML = todayExpenses.map(e => `
-                <div class="list-item">
-                    <div class="list-item-info">
-                        <h3>${e.description}</h3>
-                        <p>${e.category}</p>
-                    </div>
-                    <div style="color: #d32f2f; font-weight: bold;">R$ ${parseFloat(e.value).toFixed(2)}</div>
-                </div>
-            `).join('');
-        }
-
-        // Cozinha
-        function renderKitchenOrders() {
-            const list = document.getElementById('kitchenOrders');
-            const pendingOrders = orders.filter(o => o.status === 'pendente');
-
-            if (pendingOrders.length === 0) {
-                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✓</div>Nenhum pedido pendente</div>';
-                return;
-            }
-
-            list.innerHTML = pendingOrders.map((order, idx) => `
-                <div class="list-item">
-                    <div class="list-item-info">
-                        <h3>${order.client_name}</h3>
-                        <p>${order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</p>
-                    </div>
-                    <div class="list-item-actions">
-                        <button class="btn-primary" onclick="marcarPronto('${order.id}')">Pronto</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function marcarPronto(orderId) {
-            const order = orders.find(o => o.id == orderId);
-            if (order) {
-                order.status = 'pronto';
-                renderKitchenOrders();
-            }
-        }
-
-        // Relatórios
-        function renderStats() {
-            const today = new Date().toDateString();
-            const todayOrders = orders.filter(o => new Date(o.created_at).toDateString() === today);
-            const todayExpenses = expenses.filter(e => new Date(e.created_at).toDateString() === today);
-
+            const todayOrders = orders.filter(o => new Date(o.createdAt).toDateString() === today);
+            const completedOrders = orders.filter(o => o.status === 'pronto' && new Date(o.createdAt).toDateString() === today);
+            
             const totalSales = todayOrders.reduce((sum, o) => sum + o.total, 0);
-            const totalExpenses = todayExpenses.reduce((sum, e) => sum + e.value, 0);
-            const profit = totalSales - totalExpenses;
+            const totalCosts = inventory.reduce((sum, i) => sum + i.totalCost, 0);
+            const grossProfit = totalSales - totalCosts;
+            const netProfit = grossProfit * 0.7; // Assumindo 30% de despesas
 
             document.getElementById('statsGrid').innerHTML = `
                 <div class="stat-card">
-                    <h3>Vendas do Dia</h3>
+                    <h3>Vendas</h3>
                     <div class="value">R$ ${totalSales.toFixed(2)}</div>
                 </div>
                 <div class="stat-card">
-                    <h3>Despesas</h3>
-                    <div class="value">R$ ${totalExpenses.toFixed(2)}</div>
+                    <h3>Custos</h3>
+                    <div class="value">R$ ${totalCosts.toFixed(2)}</div>
                 </div>
                 <div class="stat-card">
-                    <h3>Lucro</h3>
-                    <div class="value" style="color: ${profit >= 0 ? '#4caf50' : '#d32f2f'};">R$ ${profit.toFixed(2)}</div>
+                    <h3>Lucro Bruto</h3>
+                    <div class="value">R$ ${grossProfit.toFixed(2)}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Lucro Líquido</h3>
+                    <div class="value">R$ ${netProfit.toFixed(2)}</div>
                 </div>
                 <div class="stat-card">
                     <h3>Pedidos</h3>
                     <div class="value">${todayOrders.length}</div>
                 </div>
+                <div class="stat-card">
+                    <h3>Prontos</h3>
+                    <div class="value">${completedOrders.length}</div>
+                </div>
             `;
-
-            const salesList = document.getElementById('salesList');
-            if (todayOrders.length === 0) {
-                salesList.innerHTML = '<div class="empty-state">Nenhuma venda hoje</div>';
-            } else {
-                salesList.innerHTML = todayOrders.map(o => `
-                    <div class="list-item">
-                        <div class="list-item-info">
-                            <h3>${o.client_name}</h3>
-                            <p>${o.items.length} item(ns)</p>
-                        </div>
-                        <div style="color: #4caf50; font-weight: bold;">R$ ${o.total.toFixed(2)}</div>
-                    </div>
-                `).join('');
-            }
         }
 
-        // Configurações
-        function salvarConfiguracoes() {
-            const storeName = document.getElementById('storeName').value.trim();
-            const storePhone = document.getElementById('storePhone').value.trim();
-            const storeEmail = document.getElementById('storeEmail').value.trim();
-
-            localStorage.setItem('storeName', storeName);
-            localStorage.setItem('storePhone', storePhone);
-            localStorage.setItem('storeEmail', storeEmail);
-
-            alert('Configurações salvas!');
+        function exportarPDF() {
+            const element = document.getElementById('statsGrid');
+            const opt = {
+                margin: 10,
+                filename: 'relatorio_vendas.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            };
+            html2pdf().set(opt).from(element).save();
         }
 
-        // Inicializar
+        function exportarExcel() {
+            const data = [
+                ['Relatório de Vendas'],
+                ['Data', new Date().toLocaleDateString()],
+                [],
+                ['Produto', 'Quantidade', 'Preço'],
+                ...orders.flatMap(o => o.items.map(i => [i.name, i.quantity, i.price]))
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Vendas');
+            XLSX.writeFile(wb, 'relatorio_vendas.xlsx');
+        }
+
         init();
     </script>
 </body>
 </html>
+Erro ao cancelar pedido no app Food Truck Manager - Manus
