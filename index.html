@@ -623,7 +623,12 @@
 
         // Dados locais
         let cart = [];
-        let products = [];
+        let products = [
+            { id: 1, name: 'Hamburguer Clássico', price: 25.00, description: 'Hamburguer com queijo e alface', category: 'Hamburguer' },
+            { id: 2, name: 'Hamburguer Especial', price: 35.00, description: 'Hamburguer com bacon e ovo', category: 'Hamburguer' },
+            { id: 3, name: 'Refrigerante 2L', price: 12.00, description: 'Refrigerante gelado', category: 'Bebida' },
+            { id: 4, name: 'Água 500ml', price: 3.00, description: 'Água mineral', category: 'Bebida' }
+        ];
         let clients = [];
         let inventory = [];
         let expenses = [];
@@ -636,7 +641,7 @@
             try {
                 // Carregar produtos
                 const { data: productsData } = await supabase.from('products').select('*');
-                if (productsData) products = productsData;
+                if (productsData && productsData.length > 0) products = productsData;
                 
                 // Carregar clientes
                 const { data: clientsData } = await supabase.from('clients').select('*');
@@ -817,8 +822,8 @@
 
         // Produtos
         async function adicionarProduto() {
-            const name = document.getElementById('newProductName').value;
-            const price = document.getElementById('newProductPrice').value;
+            const name = document.getElementById('newProductName').value.trim();
+            const price = document.getElementById('newProductPrice').value.trim();
             const desc = document.getElementById('newProductDesc').value;
             const category = document.getElementById('newProductCategory').value;
 
@@ -827,7 +832,7 @@
                 return;
             }
 
-            const product = { name, price: parseFloat(price), description: desc, category };
+            const product = { id: Date.now(), name, price: parseFloat(price), description: desc || 'Sem descricao', category };
 
             try {
                 const { data } = await supabase.from('products').insert([product]).select();
@@ -841,6 +846,8 @@
             limparFormularioProduto();
             renderProducts();
             renderProductsList();
+            alert('Produto adicionado com sucesso!');
+            location.reload();
         }
 
         function limparFormularioProduto() {
