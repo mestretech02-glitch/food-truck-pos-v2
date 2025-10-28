@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Truck Manager Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -48,8 +50,9 @@
         tr:hover { background: #1e293b; }
         textarea { width: 100%; padding: 0.75rem; background: #0f172a; border: 1px solid #334155; border-radius: 0.5rem; color: white; margin: 1rem 0; font-family: inherit; }
         textarea::placeholder { color: #64748b; }
-        input[type="text"], input[type="number"], input[type="tel"] { width: 100%; padding: 0.75rem; background: #0f172a; border: 1px solid #334155; border-radius: 0.5rem; color: white; margin-bottom: 1rem; }
+        input[type="text"], input[type="number"], input[type="tel"], select { width: 100%; padding: 0.75rem; background: #0f172a; border: 1px solid #334155; border-radius: 0.5rem; color: white; margin-bottom: 1rem; }
         input::placeholder { color: #64748b; }
+        select { cursor: pointer; }
         @media (max-width: 768px) {
             .grid-2 { grid-template-columns: 1fr; }
             .navbar { padding: 1rem; }
@@ -65,13 +68,9 @@
         <button onclick="mostrarSecao('vendas')">🛒 Vendas</button>
         <button onclick="mostrarSecao('cozinha')">👨‍🍳 Cozinha</button>
         <button onclick="mostrarSecao('produtos')">📦 Produtos</button>
-        <button onclick="mostrarSecao('clientes')">👥 Clientes</button>
-        <button onclick="mostrarSecao('combos')">🍱 Combos</button>
         <button onclick="mostrarSecao('estoque')">📋 Estoque</button>
         <button onclick="mostrarSecao('despesas')">💰 Despesas</button>
-        <button onclick="mostrarSecao('desperdicio')">🗑️ Desperdício</button>
         <button onclick="mostrarSecao('relatorios')">📊 Relatórios</button>
-        <button onclick="mostrarSecao('configuracoes')">⚙️ Configurações</button>
     </div>
 
     <!-- DASHBOARD -->
@@ -112,10 +111,6 @@
             <div>
                 <div class="section-title">Produtos</div>
                 <div id="produtosGrid"></div>
-                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #334155;">
-                    <div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 0.5rem;">Combos:</div>
-                    <div id="combosGrid" style="display: grid; grid-template-columns: 1fr; gap: 0.5rem;"></div>
-                </div>
             </div>
             <div>
                 <div class="section-title">🛒 Carrinho</div>
@@ -176,83 +171,34 @@
         </table>
     </div>
 
-    <!-- CLIENTES -->
-    <div id="clientes" class="container" style="display: none;">
-        <h1 class="section-title">👥 Clientes</h1>
-        <button class="btn-primary" onclick="abrirModalCliente()" style="margin-bottom: 1rem;">+ Novo Cliente</button>
+    <!-- DESPESAS -->
+    <div id="despesas" class="container" style="display: none;">
+        <h1 class="section-title">💰 Despesas</h1>
+        <button class="btn-primary" onclick="abrirModalDespesa()" style="margin-bottom: 1rem;">+ Novo Ingrediente</button>
         <table>
             <thead>
                 <tr>
-                    <th>Nome</th>
-                    <th>Telefone</th>
-                    <th>Email</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="clientesTabela">
-                <tr><td colspan="4" style="text-align: center;">Nenhum cliente cadastrado</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- COMBOS -->
-    <div id="combos" class="container" style="display: none;">
-        <h1 class="section-title">🍱 Combos</h1>
-        <button class="btn-primary" onclick="abrirModalCombo()" style="margin-bottom: 1rem;">+ Novo Combo</button>
-        <table>
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Preço</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="combosTabela">
-                <tr><td colspan="3" style="text-align: center;">Nenhum combo cadastrado</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- DESPERDÍCIO -->
-    <div id="desperdicio" class="container" style="display: none;">
-        <h1 class="section-title">🗑️ Desperdício</h1>
-        <button class="btn-primary" onclick="abrirModalDesperdicio()" style="margin-bottom: 1rem;">+ Registrar Desperdício</button>
-        <table>
-            <thead>
-                <tr>
-                    <th>Produto</th>
+                    <th>Ingrediente</th>
                     <th>Quantidade</th>
-                    <th>Motivo</th>
-                    <th>Valor</th>
-                    <th>Data</th>
+                    <th>Unidade</th>
+                    <th>Valor Pago</th>
+                    <th>Custo Unitário</th>
                     <th>Ações</th>
                 </tr>
             </thead>
-            <tbody id="desperdicioTabela">
-                <tr><td colspan="6" style="text-align: center;">Nenhum desperdício registrado</td></tr>
+            <tbody id="despesasTable">
+                <tr><td colspan="6" style="text-align: center;">Nenhum ingrediente cadastrado</td></tr>
             </tbody>
         </table>
-    </div>
-
-    <!-- CONFIGURAÇÕES -->
-    <div id="configuracoes" class="container" style="display: none;">
-        <h1 class="section-title">⚙️ Configurações</h1>
-        <div class="card">
-            <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Nome do Negócio:</label>
-                <input type="text" id="nomeNegocio" placeholder="Ex: Food Truck Manager" style="margin-bottom: 0;">
-            </div>
-            <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Margem de Lucro Padrão (%):</label>
-                <input type="number" id="margemLucro" placeholder="Ex: 30" min="0" max="100" style="margin-bottom: 0;">
-            </div>
-            <button class="btn-primary" onclick="salvarConfigurações()" style="width: 100%;">Salvar Configurações</button>
-        </div>
     </div>
 
     <!-- RELATÓRIOS -->
     <div id="relatorios" class="container" style="display: none;">
         <h1 class="section-title">📊 Relatórios</h1>
+        <div style="margin-bottom: 1rem; display: flex; gap: 10px;">
+            <button class="btn-primary" onclick="exportarPDF()" style="background: #10b981;">📥 Baixar PDF</button>
+            <button class="btn-primary" onclick="exportarExcel()" style="background: #3b82f6;">📊 Baixar Excel</button>
+        </div>
         <table>
             <thead>
                 <tr>
@@ -270,11 +216,10 @@
         </table>
     </div>
 
-    <!-- MODAL PERSONALIZAÇÃO PRODUTO -->
+    <!-- MODAL PERSONALIZAÇÃO -->
     <div id="modalPersonalizacao" class="modal">
         <div class="modal-content">
             <div class="modal-title" id="modalTitulo">Personalizar Produto</div>
-            <div style="color: #cbd5e1; margin-bottom: 0.5rem; font-size: 0.95rem;">Selecione as opções desejadas:</div>
             <div class="option-grid" id="opcoesGrid" style="min-height: 100px;"></div>
             <div style="margin-top: 1.5rem;">
                 <label style="color: #cbd5e1; display: block; margin-bottom: 0.5rem; font-weight: 600;">📝 Observações Adicionais:</label>
@@ -338,50 +283,23 @@
         </div>
     </div>
 
-    <!-- MODAL NOVO CLIENTE -->
-    <div id="modalCliente" class="modal">
+    <!-- MODAL DESPESA -->
+    <div id="modalDespesa" class="modal">
         <div class="modal-content">
-            <div class="modal-title">Novo Cliente</div>
-            <input type="text" id="clienteNome" placeholder="Nome do Cliente">
-            <input type="tel" id="clienteTelefone" placeholder="Telefone">
-            <input type="email" id="clienteEmail" placeholder="Email">
+            <div class="modal-title">Novo Ingrediente</div>
+            <input type="text" id="despesaNome" placeholder="Nome do Ingrediente (ex: Carne)">
+            <input type="number" id="despesaQtd" placeholder="Quantidade Comprada" step="0.01">
+            <select id="despesaUnidade">
+                <option value="kg">kg (Quilograma)</option>
+                <option value="g">g (Grama)</option>
+                <option value="L">L (Litro)</option>
+                <option value="ml">ml (Mililitro)</option>
+                <option value="un">un (Unidade)</option>
+            </select>
+            <input type="number" id="despesaValor" placeholder="Valor Pago (R$)" step="0.01">
             <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                <button class="btn-secondary" onclick="fecharModal('modalCliente')">Cancelar</button>
-                <button class="btn-primary" onclick="salvarCliente()">Salvar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL NOVO COMBO -->
-    <div id="modalCombo" class="modal">
-        <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
-            <div class="modal-title">Novo Combo</div>
-            <input type="text" id="comboNome" placeholder="Nome do Combo" style="width: 100%; padding: 10px; margin-bottom: 15px; box-sizing: border-box; border: 2px solid #22c55e; border-radius: 8px; background: #1f2937; color: #e5e7eb;">
-            
-            <label style="color: #22c55e; font-weight: 600; display: block; margin-bottom: 10px;">Selecione os Produtos:</label>
-            <div id="produtosCheckboxes" style="border: 1px solid #374151; padding: 15px; border-radius: 8px; margin-bottom: 15px; max-height: 250px; overflow-y: auto; background: #111827;">
-                <!-- Checkboxes serão adicionados aqui dinamicamente -->
-            </div>
-            
-            <input type="number" id="comboPreco" placeholder="Preço" step="0.01" style="width: 100%; padding: 10px; margin-bottom: 15px; box-sizing: border-box; border: 2px solid #1e40af; border-radius: 8px; background: #1f2937; color: #e5e7eb;">
-            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                <button class="btn-secondary" onclick="fecharModal('modalCombo')">Cancelar</button>
-                <button class="btn-primary" onclick="salvarCombo()">Salvar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL NOVO DESPERDÍCIO -->
-    <div id="modalDesperdicio" class="modal">
-        <div class="modal-content">
-            <div class="modal-title">Registrar Desperdício</div>
-            <input type="text" id="desperdicoProduto" placeholder="Nome do Produto">
-            <input type="number" id="desperdicioQtd" placeholder="Quantidade" step="0.01">
-            <input type="text" id="desperdicioMotivo" placeholder="Motivo">
-            <input type="number" id="desperdicioValor" placeholder="Valor" step="0.01">
-            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                <button class="btn-secondary" onclick="fecharModal('modalDesperdicio')">Cancelar</button>
-                <button class="btn-primary" onclick="salvarDesperdicio()">Salvar</button>
+                <button class="btn-secondary" onclick="fecharModal('modalDespesa')">Cancelar</button>
+                <button class="btn-primary" onclick="salvarDespesa()">Salvar</button>
             </div>
         </div>
     </div>
@@ -398,6 +316,7 @@
             vendas: [],
             pedidos: [],
             carrinho: [],
+            despesas: [],
             opcoes: [
                 { id: 1, nome: 'Sem Queijo', preco: 0 },
                 { id: 2, nome: 'Com Queijo', preco: 0 },
@@ -407,15 +326,7 @@
                 { id: 6, nome: 'Farofa', preco: 1.50 },
                 { id: 7, nome: 'Alface', preco: 0 },
                 { id: 8, nome: 'Tomate', preco: 0 }
-            ],
-            clientes: [],
-            combos: [],
-            desperdicio: [],
-            vendasCanceladas: [],
-            configuracoes: {
-                nomeNegocio: 'Food Truck Manager',
-                margemLucro: 30
-            }
+            ]
         };
         
         let produtoSelecionado = null;
@@ -444,6 +355,7 @@
                     { id: 8, nome: 'Tomate', preco: 0 }
                 ];
             }
+            if (!dados.despesas) dados.despesas = [];
             atualizarUI();
         }
 
@@ -455,7 +367,7 @@
         // MOSTRAR SEÇÃO
         function mostrarSecao(secao) {
             document.querySelectorAll('[id]').forEach(el => {
-                if (['dashboard', 'vendas', 'cozinha', 'produtos', 'estoque', 'relatorios'].includes(el.id)) {
+                if (['dashboard', 'vendas', 'cozinha', 'produtos', 'estoque', 'despesas', 'relatorios'].includes(el.id)) {
                     el.style.display = 'none';
                 }
             });
@@ -490,140 +402,6 @@
             atualizarUI();
         }
 
-
-        // CLIENTES
-        function abrirModalCliente() {
-            document.getElementById('clienteNome').value = '';
-            document.getElementById('clienteTelefone').value = '';
-            document.getElementById('clienteEmail').value = '';
-            abrirModal('modalCliente');
-        }
-
-        function salvarCliente() {
-            const nome = document.getElementById('clienteNome').value;
-            const telefone = document.getElementById('clienteTelefone').value;
-            const email = document.getElementById('clienteEmail').value;
-            if (!nome) { alert('Preencha o nome'); return; }
-            dados.clientes.push({ id: Date.now(), nome, telefone, email });
-            salvarDados();
-            fecharModal('modalCliente');
-            atualizarUI();
-        }
-
-        function deletarCliente(id) {
-            if (confirm('Tem certeza?')) {
-                dados.clientes = dados.clientes.filter(c => c.id !== id);
-                salvarDados();
-                atualizarUI();
-            }
-        }
-
-        // COMBOS
-        function abrirModalCombo() {
-            document.getElementById('comboNome').value = '';
-            document.getElementById('comboPreco').value = '';
-            
-            // Gerar checkboxes dos produtos
-            let checkboxesHtml = '';
-            dados.produtos.forEach(produto => {
-                checkboxesHtml += `
-                    <label style="display: flex; align-items: center; margin-bottom: 10px; cursor: pointer; color: #e5e7eb;">
-                        <input type="checkbox" id="produto_${produto.id}" style="margin-right: 10px; cursor: pointer; width: 18px; height: 18px;">
-                        <span>${produto.nome} - R$ ${produto.preco.toFixed(2)}</span>
-                    </label>
-                `;
-            });
-            document.getElementById('produtosCheckboxes').innerHTML = checkboxesHtml || '<p style="color: #9ca3af;">Nenhum produto cadastrado</p>';
-            
-            abrirModal('modalCombo');
-        }
-
-        function salvarCombo() {
-            const nome = document.getElementById('comboNome').value;
-            const preco = parseFloat(document.getElementById('comboPreco').value);
-            if (!nome || !preco) { alert('Preencha todos os campos'); return; }
-            
-            // Coletar produtos selecionados
-            const produtosSelecionados = [];
-            dados.produtos.forEach(produto => {
-                const checkbox = document.getElementById(`produto_${produto.id}`);
-                if (checkbox && checkbox.checked) {
-                    produtosSelecionados.push(produto.id);
-                }
-            });
-            
-            if (produtosSelecionados.length === 0) {
-                alert('Selecione pelo menos um produto!');
-                return;
-            }
-            
-            dados.combos.push({ id: Date.now(), nome, preco, custo: 0, produtos: produtosSelecionados });
-            salvarDados();
-            fecharModal('modalCombo');
-            atualizarUI();
-        }
-
-        function deletarCombo(id) {
-            if (confirm('Tem certeza?')) {
-                dados.combos = dados.combos.filter(c => c.id !== id);
-                salvarDados();
-                atualizarUI();
-            }
-        }
-
-        // DESPERDÍCIO
-        function abrirModalDesperdicio() {
-            document.getElementById('desperdicoProduto').value = '';
-            document.getElementById('desperdicioQtd').value = '';
-            document.getElementById('desperdicioMotivo').value = '';
-            document.getElementById('desperdicioValor').value = '';
-            abrirModal('modalDesperdicio');
-        }
-
-        function salvarDesperdicio() {
-            const produto = document.getElementById('desperdicoProduto').value;
-            const qtd = parseFloat(document.getElementById('desperdicioQtd').value);
-            const motivo = document.getElementById('desperdicioMotivo').value;
-            const valor = parseFloat(document.getElementById('desperdicioValor').value);
-            if (!produto || !qtd || !valor) { alert('Preencha todos os campos'); return; }
-            const data = new Date().toLocaleString('pt-BR');
-            dados.desperdicio.push({ id: Date.now(), produto, qtd, motivo, valor, data });
-            salvarDados();
-            fecharModal('modalDesperdicio');
-            atualizarUI();
-        }
-
-        function deletarDesperdicio(id) {
-            if (confirm('Tem certeza?')) {
-                dados.desperdicio = dados.desperdicio.filter(d => d.id !== id);
-                salvarDados();
-                atualizarUI();
-            }
-        }
-
-        // CONFIGURAÇÕES
-        function salvarConfigurações() {
-            dados.configuracoes.nomeNegocio = document.getElementById('nomeNegocio').value;
-            dados.configuracoes.margemLucro = parseFloat(document.getElementById('margemLucro').value) || 30;
-            salvarDados();
-            alert('Configurações salvas!');
-        }
-
-
-        function adicionarComboAoCarrinho(comboId) {
-            const combo = dados.combos.find(c => c.id === comboId);
-            if (!combo) return;
-            
-            dados.carrinho.push({
-                produto: { id: combo.id, nome: combo.nome, preco: combo.preco },
-                opcoes: [],
-                observacoes: '',
-                preco: combo.preco
-            });
-            
-            salvarDados();
-            atualizarUI();
-        }
         // INGREDIENTES
         function abrirModalIngrediente() {
             document.getElementById('ingNome').value = '';
@@ -641,6 +419,38 @@
             salvarDados();
             fecharModal('modalIngrediente');
             atualizarUI();
+        }
+
+        // DESPESAS
+        function abrirModalDespesa() {
+            document.getElementById('despesaNome').value = '';
+            document.getElementById('despesaQtd').value = '';
+            document.getElementById('despesaValor').value = '';
+            document.getElementById('despesaUnidade').value = 'kg';
+            abrirModal('modalDespesa');
+        }
+
+        function salvarDespesa() {
+            const nome = document.getElementById('despesaNome').value;
+            const qtd = parseFloat(document.getElementById('despesaQtd').value);
+            const unidade = document.getElementById('despesaUnidade').value;
+            const valor = parseFloat(document.getElementById('despesaValor').value);
+            
+            if (!nome || !qtd || !valor) { alert('Preencha todos os campos'); return; }
+            
+            const custoUnitario = valor / qtd;
+            dados.despesas.push({ id: Date.now(), nome, qtd, unidade, valor, custoUnitario });
+            salvarDados();
+            fecharModal('modalDespesa');
+            atualizarUI();
+        }
+
+        function deletarDespesa(id) {
+            if (confirm('Tem certeza?')) {
+                dados.despesas = dados.despesas.filter(d => d.id !== id);
+                salvarDados();
+                atualizarUI();
+            }
         }
 
         // VENDAS - PERSONALIZAÇÃO
@@ -763,16 +573,6 @@
             });
             document.getElementById('produtosGrid').innerHTML = html || '<div style="color: #94a3b8;">Nenhum produto cadastrado</div>';
 
-            // Combos em Vendas
-            html = '';
-            dados.combos.forEach(combo => {
-                html += `<div class="product-card" onclick="adicionarComboAoCarrinho(${combo.id})">
-                    <div class="product-name">${combo.nome}</div>
-                    <div class="product-price">R$ ${combo.preco.toFixed(2)}</div>
-                </div>`;
-            });
-            document.getElementById('combosGrid').innerHTML = html || '<div style="color: #94a3b8; font-size: 0.9rem;">Nenhum combo cadastrado</div>';
-
             // Carrinho
             html = '';
             let total = 0;
@@ -803,47 +603,6 @@
             });
             document.getElementById('produtosTabela').innerHTML = html || '<tr><td colspan="3" style="text-align: center;">Nenhum produto</td></tr>';
 
-            // Clientes
-            html = '';
-            dados.clientes.forEach(cliente => {
-                html += `<tr>
-                    <td>${cliente.nome}</td>
-                    <td>${cliente.telefone || '-'}</td>
-                    <td>${cliente.email || '-'}</td>
-                    <td><button class="btn-danger" onclick="deletarCliente(${cliente.id})">🗑️</button></td>
-                </tr>`;
-            });
-            document.getElementById('clientesTabela').innerHTML = html || '<tr><td colspan="4" style="text-align: center;">Nenhum cliente cadastrado</td></tr>';
-
-            // Combos
-            html = '';
-            dados.combos.forEach(combo => {
-                html += `<tr>
-                    <td>${combo.nome}</td>
-                    <td>R$ ${combo.preco.toFixed(2)}</td>
-                    <td><button class="btn-danger" onclick="deletarCombo(${combo.id})">🗑️</button></td>
-                </tr>`;
-            });
-            document.getElementById('combosTabela').innerHTML = html || '<tr><td colspan="3" style="text-align: center;">Nenhum combo cadastrado</td></tr>';
-
-            // Desperdício
-            html = '';
-            dados.desperdicio.forEach(desp => {
-                html += `<tr>
-                    <td>${desp.produto}</td>
-                    <td>${desp.qtd.toFixed(2)}</td>
-                    <td>${desp.motivo}</td>
-                    <td>R$ ${desp.valor.toFixed(2)}</td>
-                    <td>${desp.data}</td>
-                    <td><button class="btn-danger" onclick="deletarDesperdicio(${desp.id})">🗑️</button></td>
-                </tr>`;
-            });
-            document.getElementById('desperdicioTabela').innerHTML = html || '<tr><td colspan="6" style="text-align: center;">Nenhum desperdício registrado</td></tr>';
-
-            // Configurações
-            document.getElementById('nomeNegocio').value = dados.configuracoes.nomeNegocio;
-            document.getElementById('margemLucro').value = dados.configuracoes.margemLucro;
-
             // Estoque
             html = '';
             dados.ingredientes.forEach(ing => {
@@ -855,6 +614,22 @@
                 </tr>`;
             });
             document.getElementById('estoqueTabela').innerHTML = html || '<tr><td colspan="4" style="text-align: center;">Nenhum ingrediente</td></tr>';
+
+            // Despesas
+            html = '';
+            if (dados.despesas && dados.despesas.length > 0) {
+                dados.despesas.forEach(desp => {
+                    html += `<tr>
+                        <td>${desp.nome}</td>
+                        <td>${desp.qtd.toFixed(2)}</td>
+                        <td>${desp.unidade}</td>
+                        <td>R$ ${desp.valor.toFixed(2)}</td>
+                        <td>R$ ${desp.custoUnitario.toFixed(4)}/${desp.unidade}</td>
+                        <td><button class="btn-danger" onclick="deletarDespesa(${desp.id})">🗑️</button></td>
+                    </tr>`;
+                });
+            }
+            document.getElementById('despesasTable').innerHTML = html || '<tr><td colspan="6" style="text-align: center;">Nenhum ingrediente cadastrado</td></tr>';
 
             // Dashboard
             const faturamento = dados.vendas.reduce((sum, v) => sum + v.total, 0);
@@ -926,35 +701,42 @@
         }
 
         function cancelarPedido(id) {
-            const pedido = dados.pedidos.find(p => p.id === id);
-            if (!pedido) return;
-            
-            // Encontrar a venda correspondente
-            const venda = dados.vendas.find(v => v.id === pedido.id);
-            
-            if (venda) {
-                // Remover da lista de vendas
-                dados.vendas = dados.vendas.filter(v => v.id !== venda.id);
-                
-                // Adicionar à lista de canceladas
-                dados.vendasCanceladas.push({
-                    ...venda,
-                    statusCancelamento: 'cancelado',
-                    dataCancelamento: new Date().toLocaleString('pt-BR')
-                });
-                
-                // Reverter estoque (adicionar ingredientes de volta)
-                venda.itens.forEach(item => {
-                    // Aqui você pode adicionar lógica para reverter estoque
-                    // Por enquanto, apenas registramos o cancelamento
-                });
-            }
-            
-            // Remover pedido da cozinha
             dados.pedidos = dados.pedidos.filter(p => p.id !== id);
-            
             salvarDados();
             atualizarUI();
+        }
+
+        // EXPORT FUNCTIONS
+        function exportarPDF() {
+            const element = document.getElementById('relatoriosTabela').parentElement.parentElement;
+            const opt = {
+                margin: 10,
+                filename: 'relatorio_vendas.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function exportarExcel() {
+            const dados_export = [];
+            dados.vendas.forEach(venda => {
+                let itens = venda.itens.map(i => i.produto.nome).join(', ');
+                dados_export.push({
+                    'ID': venda.id,
+                    'Cliente': venda.cliente,
+                    'Telefone': venda.telefone || '-',
+                    'Produtos': itens,
+                    'Total': 'R$ ' + venda.total.toFixed(2),
+                    'Hora': venda.hora
+                });
+            });
+            
+            const ws = XLSX.utils.json_to_sheet(dados_export);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Vendas');
+            XLSX.writeFile(wb, 'relatorio_vendas.xlsx');
         }
 
         // INICIALIZAR
