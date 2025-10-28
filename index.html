@@ -5,1560 +5,655 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Truck Manager Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .navbar { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 3px solid #f97316; padding: 1rem; display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
-        .logo { font-size: 1.5rem; font-weight: bold; color: #f97316; }
-        .nav-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-        .nav-btn { padding: 0.5rem 1rem; border: none; background: #334155; color: #e2e8f0; cursor: pointer; border-radius: 0.5rem; transition: all 0.3s; }
-        .nav-btn.active { background: #f97316; color: #000; font-weight: bold; }
-        .nav-btn:hover { background: #475569; }
-        .container { padding: 2rem; max-width: 1400px; margin: 0 auto; }
-        .section { display: none; }
-        .section.active { display: block; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-        .card { background: #1e293b; border: 2px solid #334155; border-radius: 0.75rem; padding: 1.5rem; }
-        .card.active { border-color: #f97316; }
-        .product-card { cursor: pointer; transition: all 0.3s; border: 2px solid #334155; }
-        .product-card:hover { border-color: #f97316; transform: translateY(-5px); }
-        .product-card.pending { border-left: 5px solid #f97316; }
-        .product-card.ready { border-left: 5px solid #22c55e; }
-        .product-card.delayed { border-left: 5px solid #ef4444; }
-        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: bold; transition: all 0.3s; }
-        .btn-primary { background: #f97316; color: #000; }
-        .btn-primary:hover { background: #ea580c; }
-        .btn-success { background: #22c55e; color: #000; }
-        .btn-success:hover { background: #16a34a; }
-        .btn-danger { background: #ef4444; color: #fff; }
-        .btn-danger:hover { background: #dc2626; }
-        .btn-secondary { background: #475569; color: #e2e8f0; }
-        .btn-secondary:hover { background: #64748b; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: #1e293b; border: 2px solid #f97316; border-radius: 0.75rem; padding: 2rem; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
-        .modal-header { font-size: 1.5rem; font-weight: bold; color: #f97316; margin-bottom: 1.5rem; }
-        .form-group { margin-bottom: 1.5rem; }
-        .form-label { display: block; margin-bottom: 0.5rem; color: #cbd5e1; font-weight: bold; }
-        .form-input, .form-textarea, .form-select { width: 100%; padding: 0.75rem; background: #0f172a; border: 2px solid #334155; border-radius: 0.5rem; color: #e2e8f0; font-family: inherit; }
-        .form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: #f97316; }
-        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
-        .checkbox-item { display: flex; align-items: center; gap: 0.5rem; background: #0f172a; padding: 1rem; border-radius: 0.5rem; border: 2px solid #334155; }
-        .checkbox-item input { cursor: pointer; }
-        .checkbox-item label { cursor: pointer; flex: 1; }
-        .checkbox-price { color: #22c55e; font-weight: bold; }
-        .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: bold; }
-        .badge-orange { background: #f97316; color: #000; }
-        .badge-green { background: #22c55e; color: #000; }
-        .badge-red { background: #ef4444; color: #fff; }
-        .badge-blue { background: #3b82f6; color: #fff; }
-        .timer { font-size: 1.25rem; font-weight: bold; color: #f97316; }
-        .timer.warning { color: #eab308; }
-        .timer.danger { color: #ef4444; }
-        .summary-card { background: linear-gradient(135deg, #334155 0%, #1e293b 100%); border-left: 5px solid #f97316; padding: 1.5rem; border-radius: 0.5rem; }
-        .summary-value { font-size: 2rem; font-weight: bold; color: #f97316; }
-        .summary-label { color: #94a3b8; font-size: 0.875rem; }
-        .additional-tag { display: inline-block; background: #eab308; color: #000; padding: 0.25rem 0.75rem; border-radius: 0.25rem; margin-right: 0.5rem; font-size: 0.875rem; font-weight: bold; }
-        .table { width: 100%; border-collapse: collapse; }
-        .table th { background: #334155; padding: 1rem; text-align: left; border-bottom: 2px solid #f97316; }
-        .table td { padding: 1rem; border-bottom: 1px solid #334155; }
-        .table tr:hover { background: #1e293b; }
-        @media (max-width: 768px) {
-            .grid-2, .grid-3 { grid-template-columns: 1fr; }
-            .nav-tabs { flex-direction: column; }
-            .nav-btn { width: 100%; }
-            .checkbox-group { grid-template-columns: 1fr; }
-        }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
-<body>
-    <!-- NAVBAR -->
-    <div class="navbar">
-        <div class="logo">🍔 Food Truck Manager</div>
-        <div class="nav-tabs">
-            <button class="nav-btn active" onclick="mostrarSecao('dashboard')">📊 Dashboard</button>
-            <button class="nav-btn" onclick="mostrarSecao('vendas')">🛒 Vendas</button>
-            <button class="nav-btn" onclick="mostrarSecao('cozinha')">👨‍🍳 Cozinha</button>
-            <button class="nav-btn" onclick="mostrarSecao('clientes')">👥 Clientes</button>
-            <button class="nav-btn" onclick="mostrarSecao('produtos')">📦 Produtos</button>
-            <button class="nav-btn" onclick="mostrarSecao('combos')">🎁 Combos</button>
-            <button class="nav-btn" onclick="mostrarSecao('estoque')">📋 Estoque</button>
-            <button class="nav-btn" onclick="mostrarSecao('despesas')">💸 Despesas</button>
-            <button class="nav-btn" onclick="mostrarSecao('relatorios')">📊 Relatórios</button>
-            <button class="nav-btn" onclick="mostrarSecao('config')">⚙️ Config</button>
+<body class="bg-gray-900 text-white">
+    <!-- HEADER -->
+    <header class="bg-gray-800 border-b-2 border-orange-500 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl font-bold text-orange-400">🍔 Food Truck Manager</h1>
+                <button id="menu-toggle" class="md:hidden bg-orange-500 px-4 py-2 rounded text-white font-bold">☰</button>
+            </div>
+            <nav id="nav-menu" class="hidden md:flex gap-2 mt-4 md:mt-0">
+                <button onclick="irPara('dashboard')" class="nav-btn px-4 py-2 rounded hover:bg-orange-500 transition" data-tela="dashboard">📊 Dashboard</button>
+                <button onclick="irPara('vendas')" class="nav-btn px-4 py-2 rounded hover:bg-orange-500 transition" data-tela="vendas">🛒 Vendas</button>
+                <button onclick="irPara('cozinha')" class="nav-btn px-4 py-2 rounded hover:bg-orange-500 transition" data-tela="cozinha">👨‍🍳 Cozinha</button>
+                <button onclick="irPara('produtos')" class="nav-btn px-4 py-2 rounded hover:bg-orange-500 transition" data-tela="produtos">📦 Produtos</button>
+                <button onclick="irPara('estoque')" class="nav-btn px-4 py-2 rounded hover:bg-orange-500 transition" data-tela="estoque">📋 Estoque</button>
+                <button onclick="irPara('relatorios')" class="nav-btn px-4 py-2 rounded hover:bg-orange-500 transition" data-tela="relatorios">📈 Relatórios</button>
+                <button onclick="irPara('config')" class="nav-btn px-4 py-2 rounded hover:bg-orange-500 transition" data-tela="config">⚙️ Config</button>
+            </nav>
         </div>
-    </div>
+    </header>
 
-    <div class="container">
+    <!-- MAIN CONTENT -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
         <!-- DASHBOARD -->
-        <div id="dashboard" class="section active">
-            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">📊 Dashboard</h1>
-            
-            <div class="grid-3" style="margin-bottom: 2rem;">
-                <div class="summary-card">
-                    <div class="summary-label">Faturamento Bruto</div>
-                    <div class="summary-value" id="faturamento">R$ 0,00</div>
+        <div id="dashboard" class="tela">
+            <h2 class="text-3xl font-bold mb-6">Dashboard</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-green-500">
+                    <p class="text-gray-400 text-sm">Faturamento</p>
+                    <p class="text-3xl font-bold text-green-400" id="dash-faturamento">R$ 0.00</p>
                 </div>
-                <div class="summary-card">
-                    <div class="summary-label">Lucro Líquido</div>
-                    <div class="summary-value" id="lucro">R$ 0,00</div>
+                <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-blue-500">
+                    <p class="text-gray-400 text-sm">Lucro</p>
+                    <p class="text-3xl font-bold text-blue-400" id="dash-lucro">R$ 0.00</p>
                 </div>
-                <div class="summary-card">
-                    <div class="summary-label">Pedidos Hoje</div>
-                    <div class="summary-value" id="pedidosHoje">0</div>
+                <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-red-500">
+                    <p class="text-gray-400 text-sm">Despesas</p>
+                    <p class="text-3xl font-bold text-red-400" id="dash-despesas">R$ 0.00</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-yellow-500">
+                    <p class="text-gray-400 text-sm">Pedidos</p>
+                    <p class="text-3xl font-bold text-yellow-400" id="dash-pedidos">0</p>
                 </div>
             </div>
-
-            <h2 style="font-size: 1.5rem; margin: 2rem 0 1rem; color: #f97316;">🍽️ Pedidos Para Entrega</h2>
-            <div id="dashboardEntrega" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-                <p style="color: #94a3b8;">Nenhum pedido pronto para entrega</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-4">Pedidos na Cozinha</h3>
+                    <div id="dash-cozinha" class="space-y-2"></div>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-4">Últimas Vendas</h3>
+                    <div id="dash-vendas" class="space-y-2"></div>
+                </div>
             </div>
-
-            <h2 style="font-size: 1.5rem; margin: 2rem 0 1rem; color: #f97316;">📋 Histórico de Vendas (Hoje)</h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Cliente</th>
-                        <th>Produtos</th>
-                        <th>Total</th>
-                        <th>Método</th>
-                        <th>Hora</th>
-                    </tr>
-                </thead>
-                <tbody id="dashboardHistorico">
-                    <tr><td colspan="6" style="text-align: center; color: #94a3b8;">Nenhuma venda realizada</td></tr>
-                </tbody>
-            </table>
         </div>
 
         <!-- VENDAS -->
-        <div id="vendas" class="section">
-            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">🛒 Vendas</h1>
-            
-            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
-                <button class="nav-btn active" onclick="mostrarSubSecao('vendas', 'novaVenda')">Nova Venda</button>
-                <button class="nav-btn" onclick="mostrarSubSecao('vendas', 'historicoVendas')">Histórico de Vendas</button>
-            </div>
-
-            <!-- NOVA VENDA -->
-            <div id="novaVenda" class="section active">
-                <div class="grid-2">
-                    <!-- PRODUTOS -->
-                    <div>
-                        <h2 style="margin-bottom: 1.5rem; color: #f97316;">Produtos</h2>
-                        <div id="gridProdutos" style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
-                            <!-- Preenchido por JS -->
-                        </div>
-                    </div>
-
-                    <!-- CARRINHO -->
-                    <div class="card">
-                        <h2 style="margin-bottom: 1.5rem; color: #f97316;">🛒 Carrinho de Compras</h2>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Tipo de Pedido</label>
-                            <div style="display: flex; gap: 1rem;">
-                                <button class="btn btn-primary" onclick="app.vendas.tipoPedido='Local'; atualizarCarrinho()">Local</button>
-                                <button class="btn btn-secondary" onclick="app.vendas.tipoPedido='Para Viagem'; atualizarCarrinho()">Para Viagem</button>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Origem</label>
-                            <div style="display: flex; gap: 1rem;">
-                                <button class="btn btn-primary" onclick="app.vendas.origem='Venda Local'; atualizarCarrinho()">Venda Local</button>
-                                <button class="btn btn-secondary" onclick="app.vendas.origem='iFood'; atualizarCarrinho()">iFood</button>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Nome do Cliente</label>
-                            <input type="text" class="form-input" id="nomeCliente" placeholder="Buscar ou Adicionar Cliente" onchange="app.vendas.cliente = this.value">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">WhatsApp</label>
-                            <input type="text" class="form-input" id="whatsapp" placeholder="Opcional" onchange="app.vendas.whatsapp = this.value">
-                        </div>
-
-                        <div style="background: #0f172a; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem; max-height: 300px; overflow-y: auto;">
-                            <div id="itensCarrinho">
-                                <p style="color: #94a3b8;">Carrinho vazio</p>
-                            </div>
-                        </div>
-
-                        <div style="background: #334155; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                <span>Subtotal:</span>
-                                <span id="subtotal">R$ 0,00</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                <span>Taxa:</span>
-                                <span id="taxa">R$ 0,00</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: bold; color: #22c55e;">
-                                <span>Total:</span>
-                                <span id="totalCarrinho">R$ 0,00</span>
-                            </div>
-                        </div>
-
-                        <button class="btn btn-success" onclick="finalizarVenda()" style="width: 100%; padding: 1rem;">✓ Finalizar Venda</button>
-                    </div>
+        <div id="vendas" class="tela hidden">
+            <h2 class="text-3xl font-bold mb-6">Nova Venda</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- PRODUTOS -->
+                <div class="lg:col-span-2">
+                    <h3 class="text-xl font-bold mb-4">Produtos Disponíveis</h3>
+                    <div id="lista-produtos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
-            </div>
 
-            <!-- HISTÓRICO DE VENDAS -->
-            <div id="historicoVendas" class="section">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Cliente</th>
-                            <th>Produtos</th>
-                            <th>Total</th>
-                            <th>Método</th>
-                            <th>Status</th>
-                            <th>Hora</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelaHistoricoVendas">
-                        <tr><td colspan="7" style="text-align: center; color: #94a3b8;">Nenhuma venda realizada</td></tr>
-                    </tbody>
-                </table>
+                <!-- CARRINHO -->
+                <div class="bg-gray-800 p-6 rounded-lg h-fit sticky top-24">
+                    <h3 class="text-xl font-bold mb-4">🛒 Carrinho</h3>
+                    <div id="carrinho-itens" class="space-y-2 mb-4 max-h-64 overflow-y-auto"></div>
+                    <div class="border-t border-gray-700 pt-4 mb-4">
+                        <div class="flex justify-between mb-2">
+                            <span>Subtotal:</span>
+                            <span id="carrinho-subtotal">R$ 0.00</span>
+                        </div>
+                        <div class="flex justify-between text-lg font-bold text-green-400 mb-4">
+                            <span>Total:</span>
+                            <span id="carrinho-total">R$ 0.00</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        <input type="text" id="cliente-nome" placeholder="Nome do cliente" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+                        <input type="tel" id="cliente-telefone" placeholder="Telefone" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+                        <select id="tipo-pedido" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+                            <option value="local">Local</option>
+                            <option value="viagem">Viagem</option>
+                        </select>
+                    </div>
+                    <button onclick="abrirPagamento()" class="w-full bg-green-600 hover:bg-green-700 px-4 py-3 rounded font-bold mb-2">✓ Finalizar</button>
+                    <button onclick="limparCarrinho()" class="w-full bg-red-600 hover:bg-red-700 px-4 py-3 rounded font-bold">🗑️ Limpar</button>
+                </div>
             </div>
         </div>
 
         <!-- COZINHA -->
-        <div id="cozinha" class="section">
-            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">👨‍🍳 Pedidos na Cozinha</h1>
-            <div style="margin-bottom: 1rem; color: #94a3b8;">Pendentes: <span id="contadorPendentes">0</span></div>
-            <div id="gridCozinha" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
-                <p style="color: #94a3b8;">Nenhum pedido pendente</p>
-            </div>
-        </div>
-
-        <!-- CLIENTES -->
-        <div id="clientes" class="section">
-            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">👥 Clientes</h1>
-            <button class="btn btn-primary" onclick="abrirModal('modalCliente')" style="margin-bottom: 1.5rem;">+ Novo Cliente</button>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>WhatsApp</th>
-                        <th>Compras</th>
-                        <th>Total Gasto</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaClientes">
-                    <tr><td colspan="5" style="text-align: center; color: #94a3b8;">Nenhum cliente cadastrado</td></tr>
-                </tbody>
-            </table>
+        <div id="cozinha" class="tela hidden">
+            <h2 class="text-3xl font-bold mb-6">Cozinha</h2>
+            <div id="cozinha-pedidos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
         </div>
 
         <!-- PRODUTOS -->
-        <div id="produtos" class="section">
-            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">📦 Produtos</h1>
-            <button class="btn btn-primary" onclick="abrirModal('modalProduto')" style="margin-bottom: 1.5rem;">+ Novo Produto</button>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Preço</th>
-                        <th>Custo</th>
-                        <th>Lucro</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaProdutos">
-                    <tr><td colspan="5" style="text-align: center; color: #94a3b8;">Nenhum produto cadastrado</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- COMBOS -->
-        <div id="combos" class="section">
-            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">🎁 Combos</h1>
-            <button class="btn btn-primary" onclick="abrirModal('modalCombo')" style="margin-bottom: 1.5rem;">+ Novo Combo</button>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Produtos</th>
-                        <th>Preço</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaCombos">
-                    <tr><td colspan="4" style="text-align: center; color: #94a3b8;">Nenhum combo cadastrado</td></tr>
-                </tbody>
-            </table>
+        <div id="produtos" class="tela hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">Produtos</h2>
+                <button onclick="abrirModalProduto()" class="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded font-bold">+ Novo Produto</button>
+            </div>
+            <div id="tabela-produtos" class="bg-gray-800 rounded-lg overflow-x-auto"></div>
         </div>
 
         <!-- ESTOQUE -->
-        <div id="estoque" class="section">
-            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">📋 Estoque</h1>
-            <button class="btn btn-primary" onclick="abrirModal('modalIngrediente')" style="margin-bottom: 1.5rem;">+ Novo Ingrediente</button>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Ingrediente</th>
-                        <th>Estoque</th>
-                        <th>Preço Unit.</th>
-                        <th>Total</th>
-                        <th>Alerta</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaEstoque">
-                    <tr><td colspan="6" style="text-align: center; color: #94a3b8;">Nenhum ingrediente cadastrado</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- DESPESAS -->
-        <div id="despesas" class="section">
-            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">💸 Despesas</h1>
-            <button class="btn btn-primary" onclick="abrirModal('modalDespesa')" style="margin-bottom: 1.5rem;">+ Nova Despesa</button>
-            <button class="btn btn-primary" onclick="abrirModal('modalDesperdicio')" style="margin-bottom: 1.5rem;">+ Registrar Desperdício</button>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Descrição</th>
-                        <th>Categoria</th>
-                        <th>Valor</th>
-                        <th>Data</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaDespesas">
-                    <tr><td colspan="5" style="text-align: center; color: #94a3b8;">Nenhuma despesa registrada</td></tr>
-                </tbody>
-            </table>
+        <div id="estoque" class="tela hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">Estoque</h2>
+                <button onclick="abrirModalIngrediente()" class="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded font-bold">+ Novo Ingrediente</button>
+            </div>
+            <div id="tabela-estoque" class="bg-gray-800 rounded-lg overflow-x-auto"></div>
         </div>
 
         <!-- RELATÓRIOS -->
-        <div id="relatorios" class="section">
-            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">📊 Relatórios</h1>
-            <div style="margin-bottom: 2rem;">
-                <button class="btn btn-primary" onclick="exportarPDF()" style="margin-right: 1rem;">⬇️ Salvar como PDF</button>
-                <button class="btn btn-primary" onclick="exportarExcel()">📊 Exportar para Excel</button>
+        <div id="relatorios" class="tela hidden">
+            <h2 class="text-3xl font-bold mb-6">Relatórios</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-green-500">
+                    <p class="text-gray-400 text-sm">Faturamento</p>
+                    <p class="text-2xl font-bold text-green-400" id="rel-faturamento">R$ 0.00</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-red-500">
+                    <p class="text-gray-400 text-sm">Despesas</p>
+                    <p class="text-2xl font-bold text-red-400" id="rel-despesas">R$ 0.00</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-blue-500">
+                    <p class="text-gray-400 text-sm">Lucro</p>
+                    <p class="text-2xl font-bold text-blue-400" id="rel-lucro">R$ 0.00</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-purple-500">
+                    <p class="text-gray-400 text-sm">Margem</p>
+                    <p class="text-2xl font-bold text-purple-400" id="rel-margem">0%</p>
+                </div>
             </div>
-            <div class="grid-3" style="margin-bottom: 2rem;">
-                <div class="summary-card">
-                    <div class="summary-label">Faturamento</div>
-                    <div class="summary-value" id="relFaturamento">R$ 0,00</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-label">CMV</div>
-                    <div class="summary-value" id="relCMV">R$ 0,00</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-label">Lucro Bruto</div>
-                    <div class="summary-value" id="relLucroBruto">R$ 0,00</div>
-                </div>
-            </div>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Cliente</th>
-                        <th>Produtos</th>
-                        <th>Total</th>
-                        <th>Custo</th>
-                        <th>Lucro</th>
-                        <th>Método</th>
-                        <th>Data</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaRelatorios">
-                    <tr><td colspan="8" style="text-align: center; color: #94a3b8;">Nenhuma venda</td></tr>
-                </tbody>
-            </table>
+            <button onclick="exportarPDF()" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded font-bold mb-6">📄 Exportar PDF</button>
         </div>
 
         <!-- CONFIGURAÇÕES -->
-        <div id="config" class="section">
-            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #f97316;">⚙️ Configurações</h1>
-            
-            <div class="grid-2">
-                <!-- TAXAS -->
-                <div class="card">
-                    <h2 style="margin-bottom: 1.5rem; color: #f97316;">Taxas de Pagamento</h2>
-                    <div class="form-group">
-                        <label class="form-label">Taxa de Débito (%)</label>
-                        <input type="number" class="form-input" id="taxaDebito" value="1.5" onchange="app.config.taxaDebito = parseFloat(this.value); salvarDados()">
+        <div id="config" class="tela hidden">
+            <h2 class="text-3xl font-bold mb-6">Configurações</h2>
+            <div class="bg-gray-800 p-6 rounded-lg max-w-2xl">
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block text-gray-400 mb-2">Taxa Débito (%)</label>
+                        <input type="number" id="taxa-debito" step="0.01" value="1.5" class="w-full bg-gray-700 border border-gray-600 rounded px-4 py-2 text-white">
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Taxa de Crédito (%)</label>
-                        <input type="number" class="form-input" id="taxaCredito" value="2.5" onchange="app.config.taxaCredito = parseFloat(this.value); salvarDados()">
-                    </div>
-                    <button class="btn btn-success" onclick="salvarDados()" style="width: 100%;">Salvar</button>
-                </div>
-
-                <!-- ADICIONAIS -->
-                <div class="card">
-                    <h2 style="margin-bottom: 1.5rem; color: #f97316;">Adicionais</h2>
-                    <button class="btn btn-primary" onclick="abrirModal('modalAdicional')" style="width: 100%; margin-bottom: 1.5rem;">+ Novo Adicional</button>
-                    <div id="listaAdicionais" style="max-height: 400px; overflow-y: auto;">
-                        <!-- Preenchido por JS -->
+                    <div>
+                        <label class="block text-gray-400 mb-2">Taxa Crédito (%)</label>
+                        <input type="number" id="taxa-credito" step="0.01" value="2.5" class="w-full bg-gray-700 border border-gray-600 rounded px-4 py-2 text-white">
                     </div>
                 </div>
+                <button onclick="salvarConfig()" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded font-bold mr-2">💾 Salvar</button>
+                <button onclick="limparTudo()" class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded font-bold">🗑️ Limpar Tudo</button>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- MODAIS -->
-    <!-- Modal Personalizar Produto -->
-    <div id="modalPersonalizar" class="modal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <div class="modal-header" id="personalizarTitulo">Personalizar Produto</div>
-                <button class="btn btn-secondary" onclick="fecharModal('modalPersonalizar')">×</button>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Adicionais</label>
-                <div class="checkbox-group" id="adicionaisCheckboxes">
-                    <!-- Preenchido por JS -->
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Observações Adicionais</label>
-                <textarea class="form-textarea" id="observacoes" placeholder="Ex: Ponto da carne, sem picles, etc." rows="4"></textarea>
-            </div>
-
-            <div style="display: flex; gap: 1rem;">
-                <button class="btn btn-secondary" onclick="fecharModal('modalPersonalizar')" style="flex: 1;">Cancelar</button>
-                <button class="btn btn-primary" onclick="salvarPersonalizacao()" style="flex: 1;">Salvar Alterações</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Adicional -->
-    <div id="modalAdicional" class="modal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <div class="modal-header">Novo Adicional</div>
-                <button class="btn btn-secondary" onclick="fecharModal('modalAdicional')">×</button>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Nome</label>
-                <input type="text" class="form-input" id="adicionalNome" placeholder="Ex: Bacon Extra">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Preço (R$)</label>
-                <input type="number" class="form-input" id="adicionalPreco" placeholder="2.50" step="0.01">
-            </div>
-            <div style="display: flex; gap: 1rem;">
-                <button class="btn btn-secondary" onclick="fecharModal('modalAdicional')" style="flex: 1;">Cancelar</button>
-                <button class="btn btn-primary" onclick="salvarAdicional()" style="flex: 1;">Salvar</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Modal Produto -->
-    <div id="modalProduto" class="modal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <div class="modal-header">Novo Produto</div>
-                <button class="btn btn-secondary" onclick="fecharModal('modalProduto')">×</button>
+    <div id="modal-produto" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
+        <div class="bg-gray-800 p-8 rounded-lg max-w-2xl w-full my-8">
+            <h2 class="text-2xl font-bold mb-6">Produto</h2>
+            <div class="space-y-4 mb-6">
+                <input type="text" id="prod-nome" placeholder="Nome do produto" class="w-full bg-gray-700 border border-gray-600 rounded px-4 py-2 text-white">
+                <input type="number" id="prod-preco" placeholder="Preço de venda" step="0.01" class="w-full bg-gray-700 border border-gray-600 rounded px-4 py-2 text-white">
+                <input type="text" id="prod-imagem" placeholder="URL da imagem" class="w-full bg-gray-700 border border-gray-600 rounded px-4 py-2 text-white">
             </div>
-            <div class="form-group">
-                <label class="form-label">Nome</label>
-                <input type="text" class="form-input" id="produtoNome" placeholder="Ex: Hamburguer Clássico">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Preço (R$)</label>
-                <input type="number" class="form-input" id="produtoPreco" placeholder="25.00" step="0.01">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Custo (R$)</label>
-                <input type="number" class="form-input" id="produtoCusto" placeholder="8.00" step="0.01">
-            </div>
-            <div style="display: flex; gap: 1rem;">
-                <button class="btn btn-secondary" onclick="fecharModal('modalProduto')" style="flex: 1;">Cancelar</button>
-                <button class="btn btn-primary" onclick="salvarProduto()" style="flex: 1;">Salvar</button>
+            <div class="flex gap-2">
+                <button onclick="salvarProduto()" class="flex-1 bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-bold">✓ Salvar</button>
+                <button onclick="fecharModalProduto()" class="flex-1 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">✕ Cancelar</button>
             </div>
         </div>
     </div>
 
     <!-- Modal Ingrediente -->
-    <div id="modalIngrediente" class="modal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <div class="modal-header">Novo Ingrediente</div>
-                <button class="btn btn-secondary" onclick="fecharModal('modalIngrediente')">×</button>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Nome</label>
-                <input type="text" class="form-input" id="ingredienteNome" placeholder="Ex: Carne Moída">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Quantidade</label>
-                <input type="number" class="form-input" id="ingredienteQtd" placeholder="1000" step="0.01">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Unidade</label>
-                <input type="text" class="form-input" id="ingredienteUnidade" placeholder="g, un, L, etc">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Preço Unitário (R$)</label>
-                <input type="number" class="form-input" id="ingredientePreco" placeholder="0.05" step="0.01">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Alerta Estoque Baixo</label>
-                <input type="number" class="form-input" id="ingredienteAlerta" placeholder="100">
-            </div>
-            <div style="display: flex; gap: 1rem;">
-                <button class="btn btn-secondary" onclick="fecharModal('modalIngrediente')" style="flex: 1;">Cancelar</button>
-                <button class="btn btn-primary" onclick="salvarIngrediente()" style="flex: 1;">Salvar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Despesa -->
-    <div id="modalDespesa" class="modal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <div class="modal-header">Nova Despesa</div>
-                <button class="btn btn-secondary" onclick="fecharModal('modalDespesa')">×</button>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Descrição</label>
-                <input type="text" class="form-input" id="despesaDesc" placeholder="Ex: Aluguel do Ponto">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Categoria</label>
-                <select class="form-select" id="despesaCat">
-                    <option>Aluguel</option>
-                    <option>Combustível</option>
-                    <option>Manutenção</option>
-                    <option>Utensílios</option>
-                    <option>Outros</option>
+    <div id="modal-ingrediente" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-8 rounded-lg max-w-md w-full">
+            <h2 class="text-2xl font-bold mb-6">Ingrediente</h2>
+            <div class="space-y-4 mb-6">
+                <input type="text" id="ing-nome" placeholder="Nome" class="w-full bg-gray-700 border border-gray-600 rounded px-4 py-2 text-white">
+                <input type="number" id="ing-estoque" placeholder="Quantidade" step="0.01" class="w-full bg-gray-700 border border-gray-600 rounded px-4 py-2 text-white">
+                <select id="ing-unidade" class="w-full bg-gray-700 border border-gray-600 rounded px-4 py-2 text-white">
+                    <option value="un">Unidades</option>
+                    <option value="g">Gramas</option>
+                    <option value="kg">Quilogramas</option>
+                    <option value="ml">Mililitros</option>
+                    <option value="l">Litros</option>
                 </select>
+                <input type="number" id="ing-preco" placeholder="Preço unitário" step="0.01" class="w-full bg-gray-700 border border-gray-600 rounded px-4 py-2 text-white">
             </div>
-            <div class="form-group">
-                <label class="form-label">Valor (R$)</label>
-                <input type="number" class="form-input" id="despesaValor" placeholder="0.00" step="0.01">
-            </div>
-            <div style="display: flex; gap: 1rem;">
-                <button class="btn btn-secondary" onclick="fecharModal('modalDespesa')" style="flex: 1;">Cancelar</button>
-                <button class="btn btn-primary" onclick="salvarDespesa()" style="flex: 1;">Salvar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Desperdício -->
-    <div id="modalDesperdicio" class="modal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <div class="modal-header">Registrar Desperdício</div>
-                <button class="btn btn-secondary" onclick="fecharModal('modalDesperdicio')">×</button>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Ingrediente</label>
-                <select class="form-select" id="desperdicioIngrediente">
-                    <option>Selecione um ingrediente</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Quantidade</label>
-                <input type="number" class="form-input" id="desperdicioQtd" placeholder="100" step="0.01">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Motivo</label>
-                <input type="text" class="form-input" id="desperdicioMotivo" placeholder="Ex: Vencimento, Dano, etc">
-            </div>
-            <div style="display: flex; gap: 1rem;">
-                <button class="btn btn-secondary" onclick="fecharModal('modalDesperdicio')" style="flex: 1;">Cancelar</button>
-                <button class="btn btn-primary" onclick="salvarDesperdicio()" style="flex: 1;">Salvar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Combo -->
-    <div id="modalCombo" class="modal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <div class="modal-header">Novo Combo</div>
-                <button class="btn btn-secondary" onclick="fecharModal('modalCombo')">×</button>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Nome</label>
-                <input type="text" class="form-input" id="comboNome" placeholder="Ex: Combo Executivo">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Preço (R$)</label>
-                <input type="number" class="form-input" id="comboPreco" placeholder="45.00" step="0.01">
-            </div>
-            <div style="display: flex; gap: 1rem;">
-                <button class="btn btn-secondary" onclick="fecharModal('modalCombo')" style="flex: 1;">Cancelar</button>
-                <button class="btn btn-primary" onclick="salvarCombo()" style="flex: 1;">Salvar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Cliente -->
-    <div id="modalCliente" class="modal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <div class="modal-header">Novo Cliente</div>
-                <button class="btn btn-secondary" onclick="fecharModal('modalCliente')">×</button>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Nome</label>
-                <input type="text" class="form-input" id="clienteNome" placeholder="Ex: João Silva">
-            </div>
-            <div class="form-group">
-                <label class="form-label">WhatsApp</label>
-                <input type="text" class="form-input" id="clienteWhatsapp" placeholder="11999999999">
-            </div>
-            <div style="display: flex; gap: 1rem;">
-                <button class="btn btn-secondary" onclick="fecharModal('modalCliente')" style="flex: 1;">Cancelar</button>
-                <button class="btn btn-primary" onclick="salvarCliente()" style="flex: 1;">Salvar</button>
+            <div class="flex gap-2">
+                <button onclick="salvarIngrediente()" class="flex-1 bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-bold">✓ Salvar</button>
+                <button onclick="fecharModalIngrediente()" class="flex-1 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">✕ Cancelar</button>
             </div>
         </div>
     </div>
 
     <!-- Modal Pagamento -->
-    <div id="modalPagamento" class="modal">
-        <div class="modal-content" style="max-width: 400px;">
-            <div class="modal-header" style="margin-bottom: 2rem;">Método de Pagamento</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
-                <button class="btn btn-success" onclick="processarPagamento('Dinheiro')" style="padding: 2rem;">💵 Dinheiro</button>
-                <button class="btn btn-primary" onclick="processarPagamento('Débito')" style="padding: 2rem;">🏧 Débito</button>
-                <button class="btn btn-primary" onclick="processarPagamento('Crédito')" style="padding: 2rem;">💳 Crédito</button>
-                <button class="btn btn-primary" onclick="processarPagamento('PIX')" style="padding: 2rem;">📱 PIX</button>
+    <div id="modal-pagamento" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-8 rounded-lg max-w-md w-full">
+            <h2 class="text-2xl font-bold mb-6">Método de Pagamento</h2>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <button onclick="finalizarVenda('dinheiro')" class="bg-green-600 hover:bg-green-700 px-4 py-3 rounded font-bold">💵 Dinheiro</button>
+                <button onclick="finalizarVenda('debito')" class="bg-blue-600 hover:bg-blue-700 px-4 py-3 rounded font-bold">🏧 Débito</button>
+                <button onclick="finalizarVenda('credito')" class="bg-purple-600 hover:bg-purple-700 px-4 py-3 rounded font-bold">💳 Crédito</button>
+                <button onclick="finalizarVenda('pix')" class="bg-orange-600 hover:bg-orange-700 px-4 py-3 rounded font-bold">📱 PIX</button>
             </div>
-            <button class="btn btn-secondary" onclick="fecharModal('modalPagamento')" style="width: 100%;">Cancelar</button>
+            <button onclick="fecharPagamento()" class="w-full bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">✕ Cancelar</button>
         </div>
     </div>
 
     <!-- Modal Sucesso -->
-    <div id="modalSucesso" class="modal">
-        <div class="modal-content" style="max-width: 400px; text-align: center;">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">✓</div>
-            <div class="modal-header" style="margin-bottom: 1rem;">Venda Realizada!</div>
-            <div style="margin-bottom: 1rem;">
-                <div style="color: #94a3b8; margin-bottom: 0.5rem;">Número do Pedido:</div>
-                <div style="font-size: 1.5rem; font-weight: bold; color: #f97316;" id="numeroPedidoSucesso">#1</div>
-            </div>
-            <div style="margin-bottom: 2rem;">
-                <div style="color: #94a3b8; margin-bottom: 0.5rem;">Total:</div>
-                <div style="font-size: 1.5rem; font-weight: bold; color: #22c55e;" id="totalSucesso">R$ 0,00</div>
-            </div>
-            <button class="btn btn-success" onclick="fecharModal('modalSucesso'); mostrarSecao('vendas')" style="width: 100%;">OK</button>
+    <div id="modal-sucesso" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-8 rounded-lg max-w-md w-full text-center">
+            <h2 class="text-3xl font-bold mb-4 text-green-400">✓ Venda Realizada!</h2>
+            <p class="text-gray-400 mb-2">Pedido #</p>
+            <p class="text-5xl font-bold text-orange-400 mb-6" id="numero-pedido">0</p>
+            <button onclick="fecharSucesso()" class="w-full bg-orange-500 hover:bg-orange-600 px-4 py-3 rounded font-bold">OK</button>
         </div>
     </div>
 
     <script>
-        // DADOS GLOBAIS
-        const app = {
-            vendas: {
-                cliente: '',
-                whatsapp: '',
-                tipoPedido: 'Local',
-                origem: 'Venda Local',
-                itens: [],
-                metodo: ''
-            },
-            config: {
-                taxaDebito: 1.5,
-                taxaCredito: 2.5
-            },
-            personalizandoProduto: null
-        };
-
-        let dados = {
-            produtos: [
-                { id: 1, nome: '🍔 Hamburguer Clássico', preco: 25.00, custo: 8.00 },
-                { id: 2, nome: '🍔 Hamburguer Especial', preco: 35.00, custo: 12.00 },
-                { id: 3, nome: '🍢 Churrascão de Alcatra', preco: 15.00, custo: 6.45 }
-            ],
-            adicionais: [
-                { id: 1, nome: 'Maionese Temperada', preco: 2.00 },
-                { id: 2, nome: 'Farofa', preco: 1.50 },
-                { id: 3, nome: 'Queijo Extra', preco: 3.00 },
-                { id: 4, nome: 'Bacon Extra', preco: 4.00 },
-                { id: 5, nome: 'Sem Cebola', preco: 0.00 }
-            ],
-            vendas: [],
-            pedidos: [],
-            clientes: [],
+        // ===== DADOS =====
+        let app = {
+            produtos: [],
             ingredientes: [],
-            despesas: [],
-            combos: [],
-            desperdicio: []
+            vendas: [],
+            carrinho: [],
+            config: { taxaDebito: 1.5, taxaCredito: 2.5 },
+            proximoId: 1
         };
 
-        // CARREGAR DADOS
+        // Carregar dados
         function carregarDados() {
-            const saved = localStorage.getItem('foodTruckData');
-            if (saved) {
-                dados = JSON.parse(saved);
+            const dados = localStorage.getItem('foodTruck');
+            if (dados) {
+                app = JSON.parse(dados);
+            } else {
+                app.produtos = [
+                    { id: 1, nome: 'Hamburguer Clássico', preco: 25.00, imagem: 'https://via.placeholder.com/200?text=Hamburguer' },
+                    { id: 2, nome: 'Hamburguer Especial', preco: 35.00, imagem: 'https://via.placeholder.com/200?text=Especial' }
+                ];
+                app.ingredientes = [
+                    { id: 1, nome: 'Pão', estoque: 100, unidade: 'un', preco: 0.50 },
+                    { id: 2, nome: 'Carne', estoque: 5000, unidade: 'g', preco: 0.03 }
+                ];
+                app.proximoId = 3;
+                salvarDados();
             }
-            const configSaved = localStorage.getItem('foodTruckConfig');
-            if (configSaved) {
-                app.config = JSON.parse(configSaved);
-                document.getElementById('taxaDebito').value = app.config.taxaDebito;
-                document.getElementById('taxaCredito').value = app.config.taxaCredito;
-            }
-            atualizarUI();
         }
 
-        // SALVAR DADOS
         function salvarDados() {
-            localStorage.setItem('foodTruckData', JSON.stringify(dados));
-            localStorage.setItem('foodTruckConfig', JSON.stringify(app.config));
-            atualizarUI();
+            localStorage.setItem('foodTruck', JSON.stringify(app));
         }
 
-        // MOSTRAR SEÇÃO
-        function mostrarSecao(secao) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById(secao).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            atualizarUI();
-        }
-
-        // MOSTRAR SUB-SEÇÃO
-        function mostrarSubSecao(pai, sub) {
-            document.querySelectorAll(`#${pai} .section`).forEach(s => s.classList.remove('active'));
-            document.getElementById(sub).classList.add('active');
-            event.target.parentElement.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-        }
-
-        // ABRIR/FECHAR MODAL
-        function abrirModal(id) {
-            document.getElementById(id).classList.add('active');
-        }
-
-        function fecharModal(id) {
-            document.getElementById(id).classList.remove('active');
-        }
-
-        // ADICIONAR PRODUTO AO CARRINHO (ABRE MODAL)
-        function adicionarAoCarrinho(produtoId) {
-            const produto = dados.produtos.find(p => p.id === produtoId);
-            if (!produto) return;
-
-            app.personalizandoProduto = {
-                id: produtoId,
-                nome: produto.nome,
-                preco: produto.preco,
-                custo: produto.custo,
-                adicionais: [],
-                observacoes: ''
-            };
-
-            document.getElementById('personalizarTitulo').textContent = `Personalizar ${produto.nome}`;
+        // ===== NAVEGAÇÃO =====
+        function irPara(tela) {
+            document.querySelectorAll('.tela').forEach(t => t.classList.add('hidden'));
+            document.getElementById(tela).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('bg-orange-500'));
+            document.querySelector(`[data-tela="${tela}"]`)?.classList.add('bg-orange-500');
             
-            // PREENCHER CHECKBOXES
-            let checkboxesHtml = '';
-            dados.adicionais.forEach(ad => {
-                checkboxesHtml += `
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="ad_${ad.id}" onchange="atualizarAdicionais()">
-                        <label for="ad_${ad.id}">${ad.nome}</label>
-                        <span class="checkbox-price">R$ ${ad.preco.toFixed(2)}</span>
+            if (tela === 'dashboard') renderDashboard();
+            else if (tela === 'vendas') renderVendas();
+            else if (tela === 'cozinha') renderCozinha();
+            else if (tela === 'produtos') renderProdutos();
+            else if (tela === 'estoque') renderEstoque();
+            else if (tela === 'relatorios') renderRelatorios();
+        }
+
+        document.getElementById('menu-toggle').addEventListener('click', () => {
+            document.getElementById('nav-menu').classList.toggle('hidden');
+        });
+
+        // ===== DASHBOARD =====
+        function renderDashboard() {
+            const hoje = new Date().toDateString();
+            const vendasHoje = app.vendas.filter(v => new Date(v.data).toDateString() === hoje);
+            
+            const faturamento = vendasHoje.reduce((sum, v) => sum + v.total, 0);
+            const despesas = vendasHoje.reduce((sum, v) => sum + (v.taxa || 0), 0);
+            const lucro = faturamento - despesas;
+
+            document.getElementById('dash-faturamento').textContent = `R$ ${faturamento.toFixed(2)}`;
+            document.getElementById('dash-lucro').textContent = `R$ ${lucro.toFixed(2)}`;
+            document.getElementById('dash-despesas').textContent = `R$ ${despesas.toFixed(2)}`;
+            document.getElementById('dash-pedidos').textContent = vendasHoje.length;
+
+            document.getElementById('dash-cozinha').innerHTML = app.vendas
+                .filter(v => v.status === 'pendente')
+                .slice(-5)
+                .map(v => `<div class="bg-yellow-900 p-3 rounded">Pedido #${v.id} - ${v.cliente}</div>`)
+                .join('') || '<p class="text-gray-500">Nenhum pedido</p>';
+
+            document.getElementById('dash-vendas').innerHTML = vendasHoje
+                .slice(-5)
+                .map(v => `<div class="bg-green-900 p-3 rounded">Pedido #${v.id} - R$ ${v.total.toFixed(2)}</div>`)
+                .join('') || '<p class="text-gray-500">Nenhuma venda</p>';
+        }
+
+        // ===== VENDAS =====
+        function renderVendas() {
+            document.getElementById('lista-produtos').innerHTML = app.produtos.map(p => `
+                <div onclick="adicionarCarrinho(${p.id}, '${p.nome}', ${p.preco})" class="bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-orange-500 transition">
+                    <img src="${p.imagem}" alt="${p.nome}" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <h3 class="font-bold mb-2">${p.nome}</h3>
+                        <p class="text-green-400 font-bold">R$ ${p.preco.toFixed(2)}</p>
                     </div>
-                `;
-            });
-            document.getElementById('adicionaisCheckboxes').innerHTML = checkboxesHtml;
-            document.getElementById('observacoes').value = '';
-
-            abrirModal('modalPersonalizar');
-        }
-
-        // ATUALIZAR ADICIONAIS SELECIONADOS
-        function atualizarAdicionais() {
-            app.personalizandoProduto.adicionais = [];
-            dados.adicionais.forEach(ad => {
-                if (document.getElementById(`ad_${ad.id}`).checked) {
-                    app.personalizandoProduto.adicionais.push(ad.id);
-                }
-            });
-        }
-
-        // SALVAR PERSONALIZAÇÃO
-        function salvarPersonalizacao() {
-            atualizarAdicionais();
-            app.personalizandoProduto.observacoes = document.getElementById('observacoes').value;
-
-            app.vendas.itens.push({
-                id: app.personalizandoProduto.id,
-                nome: app.personalizandoProduto.nome,
-                preco: app.personalizandoProduto.preco,
-                custo: app.personalizandoProduto.custo,
-                adicionais: app.personalizandoProduto.adicionais,
-                observacoes: app.personalizandoProduto.observacoes,
-                quantidade: 1
-            });
-
-            fecharModal('modalPersonalizar');
+                </div>
+            `).join('');
             atualizarCarrinho();
         }
 
-        // ATUALIZAR CARRINHO
+        function adicionarCarrinho(id, nome, preco) {
+            const item = app.carrinho.find(i => i.id === id);
+            if (item) {
+                item.qtd++;
+            } else {
+                app.carrinho.push({ id, nome, preco, qtd: 1 });
+            }
+            atualizarCarrinho();
+        }
+
         function atualizarCarrinho() {
-            const container = document.getElementById('itensCarrinho');
-            
-            if (app.vendas.itens.length === 0) {
-                container.innerHTML = '<p style="color: #94a3b8;">Carrinho vazio</p>';
-                document.getElementById('subtotal').textContent = 'R$ 0,00';
-                document.getElementById('taxa').textContent = 'R$ 0,00';
-                document.getElementById('totalCarrinho').textContent = 'R$ 0,00';
-                return;
-            }
-
-            let html = '';
-            let subtotal = 0;
-
-            app.vendas.itens.forEach((item, idx) => {
-                let precoItem = item.preco;
-                let adicionaisHtml = '';
-                
-                if (item.adicionais && item.adicionais.length > 0) {
-                    item.adicionais.forEach(adId => {
-                        const ad = dados.adicionais.find(a => a.id === adId);
-                        if (ad) {
-                            precoItem += ad.preco;
-                            adicionaisHtml += `<span class="additional-tag">${ad.nome}</span>`;
-                        }
-                    });
-                }
-
-                subtotal += precoItem * (item.quantidade || 1);
-
-                html += `
-                    <div style="background: #0f172a; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; border-left: 3px solid #f97316;">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                            <div>
-                                <div style="font-weight: bold;">${item.nome}</div>
-                                <div style="color: #94a3b8; font-size: 0.875rem;">${adicionaisHtml}</div>
-                                ${item.observacoes ? `<div style="color: #94a3b8; font-size: 0.875rem; margin-top: 0.5rem;">📝 ${item.observacoes}</div>` : ''}
-                            </div>
-                            <button class="btn btn-danger" onclick="removerDoCarrinho(${idx})" style="padding: 0.25rem 0.75rem;">✕</button>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div style="color: #94a3b8;">
-                                <input type="number" value="${item.quantidade || 1}" min="1" style="width: 50px; padding: 0.25rem; background: #1e293b; border: 1px solid #334155; color: #e2e8f0; border-radius: 0.25rem;" onchange="app.vendas.itens[${idx}].quantidade = parseInt(this.value); atualizarCarrinho()">
-                            </div>
-                            <div style="font-weight: bold; color: #f97316;">R$ ${precoItem.toFixed(2)}</div>
-                        </div>
+            document.getElementById('carrinho-itens').innerHTML = app.carrinho.map((item, idx) => `
+                <div class="bg-gray-700 p-3 rounded flex justify-between items-center">
+                    <div>
+                        <p class="font-bold">${item.nome}</p>
+                        <p class="text-sm text-gray-400">R$ ${item.preco.toFixed(2)}</p>
                     </div>
-                `;
-            });
+                    <div class="flex items-center gap-2">
+                        <input type="number" value="${item.qtd}" min="1" onchange="alterarQtd(${idx}, this.value)" class="w-12 bg-gray-600 rounded px-2 py-1 text-center text-white">
+                        <button onclick="removerCarrinho(${idx})" class="bg-red-600 px-2 py-1 rounded text-sm">✕</button>
+                    </div>
+                </div>
+            `).join('');
 
-            container.innerHTML = html;
-
-            let taxa = 0;
-            if (app.vendas.metodo === 'Débito') {
-                taxa = subtotal * (app.config.taxaDebito / 100);
-            } else if (app.vendas.metodo === 'Crédito') {
-                taxa = subtotal * (app.config.taxaCredito / 100);
-            }
-
-            const total = subtotal + taxa;
-
-            document.getElementById('subtotal').textContent = `R$ ${subtotal.toFixed(2)}`;
-            document.getElementById('taxa').textContent = `R$ ${taxa.toFixed(2)}`;
-            document.getElementById('totalCarrinho').textContent = `R$ ${total.toFixed(2)}`;
+            const subtotal = app.carrinho.reduce((sum, item) => sum + (item.preco * item.qtd), 0);
+            document.getElementById('carrinho-subtotal').textContent = `R$ ${subtotal.toFixed(2)}`;
+            document.getElementById('carrinho-total').textContent = `R$ ${subtotal.toFixed(2)}`;
         }
 
-        // REMOVER DO CARRINHO
-        function removerDoCarrinho(idx) {
-            app.vendas.itens.splice(idx, 1);
+        function alterarQtd(idx, qtd) {
+            const q = parseInt(qtd) || 1;
+            if (q > 0) app.carrinho[idx].qtd = q;
+            else app.carrinho.splice(idx, 1);
             atualizarCarrinho();
         }
 
-        // FINALIZAR VENDA
-        function finalizarVenda() {
-            if (app.vendas.itens.length === 0) {
-                alert('Adicione produtos ao carrinho');
-                return;
-            }
-            if (!app.vendas.cliente) {
-                alert('Informe o nome do cliente');
-                return;
-            }
-            abrirModal('modalPagamento');
+        function removerCarrinho(idx) {
+            app.carrinho.splice(idx, 1);
+            atualizarCarrinho();
         }
 
-        // PROCESSAR PAGAMENTO
-        function processarPagamento(metodo) {
-            fecharModal('modalPagamento');
-            app.vendas.metodo = metodo;
+        function limparCarrinho() {
+            app.carrinho = [];
+            atualizarCarrinho();
+        }
 
-            const subtotal = app.vendas.itens.reduce((sum, item) => {
-                let preco = item.preco;
-                if (item.adicionais) {
-                    item.adicionais.forEach(adId => {
-                        const ad = dados.adicionais.find(a => a.id === adId);
-                        if (ad) preco += ad.preco;
-                    });
-                }
-                return sum + (preco * (item.quantidade || 1));
-            }, 0);
-
-            let taxa = 0;
-            if (metodo === 'Débito') {
-                taxa = subtotal * (app.config.taxaDebito / 100);
-            } else if (metodo === 'Crédito') {
-                taxa = subtotal * (app.config.taxaCredito / 100);
+        function abrirPagamento() {
+            if (app.carrinho.length === 0) {
+                alert('Carrinho vazio!');
+                return;
             }
+            document.getElementById('modal-pagamento').classList.remove('hidden');
+        }
 
-            const total = subtotal + taxa;
+        function fecharPagamento() {
+            document.getElementById('modal-pagamento').classList.add('hidden');
+        }
+
+        function finalizarVenda(metodo) {
+            const cliente = document.getElementById('cliente-nome').value || 'Anônimo';
+            const tipo = document.getElementById('tipo-pedido').value;
+            const total = app.carrinho.reduce((sum, item) => sum + (item.preco * item.qtd), 0);
+            
+            let taxa = 0;
+            if (metodo === 'debito') taxa = total * (app.config.taxaDebito / 100);
+            else if (metodo === 'credito') taxa = total * (app.config.taxaCredito / 100);
 
             const venda = {
-                id: dados.vendas.length + 1,
-                numero: dados.pedidos.length + 1,
-                cliente: app.vendas.cliente,
-                whatsapp: app.vendas.whatsapp,
-                tipoPedido: app.vendas.tipoPedido,
-                origem: app.vendas.origem,
-                itens: [...app.vendas.itens],
-                subtotal: subtotal,
-                taxa: taxa,
-                total: total,
-                metodo: metodo,
-                data: new Date().toLocaleDateString('pt-BR'),
-                hora: new Date().toLocaleTimeString('pt-BR'),
-                status: 'pendente'
-            };
-
-            dados.vendas.push(venda);
-
-            const pedido = {
-                id: venda.numero,
-                numero: venda.numero,
-                cliente: venda.cliente,
-                whatsapp: venda.whatsapp,
-                tipoPedido: venda.tipoPedido,
-                itens: venda.itens,
+                id: app.proximoId++,
+                cliente,
+                itens: [...app.carrinho],
+                total,
+                taxa,
+                metodo,
+                tipo,
                 status: 'pendente',
-                dataHora: new Date(),
-                tempoInicio: new Date()
+                data: new Date().toISOString()
             };
 
-            dados.pedidos.push(pedido);
-
-            document.getElementById('numeroPedidoSucesso').textContent = `#${venda.numero}`;
-            document.getElementById('totalSucesso').textContent = `R$ ${total.toFixed(2)}`;
-
-            abrirModal('modalSucesso');
-
-            app.vendas = {
-                cliente: '',
-                whatsapp: '',
-                tipoPedido: 'Local',
-                origem: 'Venda Local',
-                itens: [],
-                metodo: ''
-            };
-
-            document.getElementById('nomeCliente').value = '';
-            document.getElementById('whatsapp').value = '';
-
+            app.vendas.push(venda);
             salvarDados();
+
+            document.getElementById('numero-pedido').textContent = venda.id;
+            document.getElementById('modal-pagamento').classList.add('hidden');
+            document.getElementById('modal-sucesso').classList.remove('hidden');
+
+            app.carrinho = [];
+            document.getElementById('cliente-nome').value = '';
+            document.getElementById('cliente-telefone').value = '';
+            atualizarCarrinho();
         }
 
-        // SALVAR ADICIONAL
-        function salvarAdicional() {
-            const nome = document.getElementById('adicionalNome').value;
-            const preco = parseFloat(document.getElementById('adicionalPreco').value);
-
-            if (!nome || isNaN(preco)) {
-                alert('Preencha todos os campos');
-                return;
-            }
-
-            dados.adicionais.push({
-                id: Math.max(...dados.adicionais.map(a => a.id), 0) + 1,
-                nome: nome,
-                preco: preco
-            });
-
-            document.getElementById('adicionalNome').value = '';
-            document.getElementById('adicionalPreco').value = '';
-
-            fecharModal('modalAdicional');
-            salvarDados();
+        function fecharSucesso() {
+            document.getElementById('modal-sucesso').classList.add('hidden');
+            renderVendas();
         }
 
-        // EDITAR ADICIONAL
-        function editarAdicional(id) {
-            const adicional = dados.adicionais.find(a => a.id === id);
-            if (!adicional) return;
-
-            document.getElementById('adicionalNome').value = adicional.nome;
-            document.getElementById('adicionalPreco').value = adicional.preco;
-
-            // Mudar função do botão para atualizar
-            const botaoSalvar = document.querySelector('#modalAdicional .btn-primary');
-            botaoSalvar.textContent = 'Atualizar';
-            botaoSalvar.onclick = () => {
-                const novoNome = document.getElementById('adicionalNome').value;
-                const novoPreco = parseFloat(document.getElementById('adicionalPreco').value);
-
-                if (!novoNome || isNaN(novoPreco)) {
-                    alert('Preencha todos os campos');
-                    return;
-                }
-
-                adicional.nome = novoNome;
-                adicional.preco = novoPreco;
-
-                document.getElementById('adicionalNome').value = '';
-                document.getElementById('adicionalPreco').value = '';
-                botaoSalvar.textContent = 'Salvar';
-                botaoSalvar.onclick = salvarAdicional;
-
-                fecharModal('modalAdicional');
-                salvarDados();
-            };
-
-            abrirModal('modalAdicional');
-        }
-
-        // DELETAR ADICIONAL
-        function deletarAdicional(id) {
-            if (confirm('Tem certeza que deseja deletar este adicional?')) {
-                dados.adicionais = dados.adicionais.filter(a => a.id !== id);
-                salvarDados();
-            }
-        }
-
-        // SALVAR PRODUTO
-        function salvarProduto() {
-            const nome = document.getElementById('produtoNome').value;
-            const preco = parseFloat(document.getElementById('produtoPreco').value);
-            const custo = parseFloat(document.getElementById('produtoCusto').value);
-
-            if (!nome || !preco || !custo) {
-                alert('Preencha todos os campos');
-                return;
-            }
-
-            dados.produtos.push({
-                id: dados.produtos.length + 1,
-                nome: nome,
-                preco: preco,
-                custo: custo
-            });
-
-            document.getElementById('produtoNome').value = '';
-            document.getElementById('produtoPreco').value = '';
-            document.getElementById('produtoCusto').value = '';
-
-            fecharModal('modalProduto');
-            salvarDados();
-        }
-
-        // SALVAR INGREDIENTE
-        function salvarIngrediente() {
-            const nome = document.getElementById('ingredienteNome').value;
-            const qtd = parseFloat(document.getElementById('ingredienteQtd').value);
-            const unidade = document.getElementById('ingredienteUnidade').value;
-            const preco = parseFloat(document.getElementById('ingredientePreco').value);
-            const alerta = parseFloat(document.getElementById('ingredienteAlerta').value);
-
-            if (!nome || !qtd || !unidade || !preco) {
-                alert('Preencha todos os campos');
-                return;
-            }
-
-            dados.ingredientes.push({
-                id: dados.ingredientes.length + 1,
-                nome: nome,
-                quantidade: qtd,
-                unidade: unidade,
-                preco: preco,
-                alerta: alerta || qtd * 0.2
-            });
-
-            document.getElementById('ingredienteNome').value = '';
-            document.getElementById('ingredienteQtd').value = '';
-            document.getElementById('ingredienteUnidade').value = '';
-            document.getElementById('ingredientePreco').value = '';
-            document.getElementById('ingredienteAlerta').value = '';
-
-            fecharModal('modalIngrediente');
-            salvarDados();
-        }
-
-        // SALVAR DESPESA
-        function salvarDespesa() {
-            const desc = document.getElementById('despesaDesc').value;
-            const cat = document.getElementById('despesaCat').value;
-            const valor = parseFloat(document.getElementById('despesaValor').value);
-
-            if (!desc || !valor) {
-                alert('Preencha todos os campos');
-                return;
-            }
-
-            dados.despesas.push({
-                id: dados.despesas.length + 1,
-                descricao: desc,
-                categoria: cat,
-                valor: valor,
-                data: new Date().toLocaleDateString('pt-BR')
-            });
-
-            document.getElementById('despesaDesc').value = '';
-            document.getElementById('despesaValor').value = '';
-
-            fecharModal('modalDespesa');
-            salvarDados();
-        }
-
-        // SALVAR DESPERDÍCIO
-        function salvarDesperdicio() {
-            const ing = document.getElementById('desperdicioIngrediente').value;
-            const qtd = parseFloat(document.getElementById('desperdicioQtd').value);
-            const motivo = document.getElementById('desperdicioMotivo').value;
-
-            if (!ing || !qtd || !motivo) {
-                alert('Preencha todos os campos');
-                return;
-            }
-
-            dados.desperdicio.push({
-                id: dados.desperdicio.length + 1,
-                ingrediente: ing,
-                quantidade: qtd,
-                motivo: motivo,
-                data: new Date().toLocaleDateString('pt-BR')
-            });
-
-            document.getElementById('desperdicioIngrediente').value = '';
-            document.getElementById('desperdicioQtd').value = '';
-            document.getElementById('desperdicioMotivo').value = '';
-
-            fecharModal('modalDesperdicio');
-            salvarDados();
-        }
-
-        // SALVAR COMBO
-        function salvarCombo() {
-            const nome = document.getElementById('comboNome').value;
-            const preco = parseFloat(document.getElementById('comboPreco').value);
-
-            if (!nome || !preco) {
-                alert('Preencha todos os campos');
-                return;
-            }
-
-            dados.combos.push({
-                id: dados.combos.length + 1,
-                nome: nome,
-                preco: preco
-            });
-
-            document.getElementById('comboNome').value = '';
-            document.getElementById('comboPreco').value = '';
-
-            fecharModal('modalCombo');
-            salvarDados();
-        }
-
-        // SALVAR CLIENTE
-        function salvarCliente() {
-            const nome = document.getElementById('clienteNome').value;
-            const whatsapp = document.getElementById('clienteWhatsapp').value;
-
-            if (!nome) {
-                alert('Informe o nome');
-                return;
-            }
-
-            dados.clientes.push({
-                id: dados.clientes.length + 1,
-                nome: nome,
-                whatsapp: whatsapp || ''
-            });
-
-            document.getElementById('clienteNome').value = '';
-            document.getElementById('clienteWhatsapp').value = '';
-
-            fecharModal('modalCliente');
-            salvarDados();
-        }
-
-        // MARCAR PEDIDO COMO PRONTO
-        function marcarPronto(pedidoId) {
-            const pedido = dados.pedidos.find(p => p.numero === pedidoId);
-            if (pedido) {
-                pedido.status = 'pronto';
-                salvarDados();
-            }
-        }
-
-        // CANCELAR PEDIDO
-        function cancelarPedido(pedidoId) {
-            const pedido = dados.pedidos.find(p => p.numero === pedidoId);
-            if (pedido) {
-                pedido.status = 'cancelado';
-                dados.vendas = dados.vendas.filter(v => v.numero !== pedidoId);
-                salvarDados();
-            }
-        }
-
-        // ATUALIZAR UI
-        function atualizarUI() {
-            // DASHBOARD
-            const vendas = dados.vendas.filter(v => v.data === new Date().toLocaleDateString('pt-BR'));
-            const faturamento = vendas.reduce((sum, v) => sum + v.total, 0);
-            const custos = vendas.reduce((sum, v) => {
-                return sum + v.itens.reduce((itemSum, item) => itemSum + item.custo, 0);
-            }, 0);
-            const lucro = faturamento - custos;
-
-            document.getElementById('faturamento').textContent = `R$ ${faturamento.toFixed(2)}`;
-            document.getElementById('lucro').textContent = `R$ ${lucro.toFixed(2)}`;
-            document.getElementById('pedidosHoje').textContent = vendas.length;
-
-            // DASHBOARD - HISTÓRICO
-            let historicoHtml = '';
-            vendas.forEach(v => {
-                historicoHtml += `
-                    <tr>
-                        <td>#${v.numero}</td>
-                        <td>${v.cliente}</td>
-                        <td>${v.itens.map(i => i.nome).join(', ')}</td>
-                        <td>R$ ${v.total.toFixed(2)}</td>
-                        <td>${v.metodo}</td>
-                        <td>${v.hora}</td>
-                    </tr>
-                `;
-            });
-            document.getElementById('dashboardHistorico').innerHTML = historicoHtml || '<tr><td colspan="6" style="text-align: center; color: #94a3b8;">Nenhuma venda realizada</td></tr>';
-
-            // DASHBOARD - PARA ENTREGA
-            const prontos = dados.pedidos.filter(p => p.status === 'pronto');
-            let entregaHtml = '';
-            prontos.forEach(p => {
-                entregaHtml += `
-                    <div class="card" style="border-left: 5px solid #22c55e;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #f97316;">#${p.numero}</div>
-                            <span class="badge badge-green">PRONTO</span>
-                        </div>
-                        <div style="margin-bottom: 1rem;">
-                            <div style="color: #94a3b8; font-size: 0.875rem;">Cliente:</div>
-                            <div style="font-weight: bold;">${p.cliente}</div>
-                        </div>
-                        <div style="margin-bottom: 1rem;">
-                            <div style="color: #94a3b8; font-size: 0.875rem;">Produtos:</div>
-                            <div>${p.itens.map(i => i.nome).join(', ')}</div>
-                        </div>
-                    </div>
-                `;
-            });
-            document.getElementById('dashboardEntrega').innerHTML = entregaHtml || '<p style="color: #94a3b8;">Nenhum pedido pronto para entrega</p>';
-
-            // PRODUTOS
-            let produtosHtml = '';
-            dados.produtos.forEach(p => {
-                const lucro = p.preco - p.custo;
-                produtosHtml += `
-                    <tr>
-                        <td>${p.nome}</td>
-                        <td>R$ ${p.preco.toFixed(2)}</td>
-                        <td>R$ ${p.custo.toFixed(2)}</td>
-                        <td style="color: #22c55e;">R$ ${lucro.toFixed(2)}</td>
-                        <td>
-                            <button class="btn btn-danger" onclick="deletarProduto(${p.id})" style="padding: 0.25rem 0.75rem;">🗑️</button>
-                        </td>
-                    </tr>
-                `;
-            });
-            document.getElementById('tabelaProdutos').innerHTML = produtosHtml || '<tr><td colspan="5" style="text-align: center; color: #94a3b8;">Nenhum produto cadastrado</td></tr>';
-
-            // ESTOQUE
-            let estoqueHtml = '';
-            dados.ingredientes.forEach(i => {
-                const total = i.quantidade * i.preco;
-                const alerta = i.quantidade < i.alerta ? '<span class="badge badge-red">BAIXO</span>' : '';
-                estoqueHtml += `
-                    <tr>
-                        <td>${i.nome}</td>
-                        <td>${i.quantidade} ${i.unidade}</td>
-                        <td>R$ ${i.preco.toFixed(2)}</td>
-                        <td>R$ ${total.toFixed(2)}</td>
-                        <td>${alerta}</td>
-                        <td>
-                            <button class="btn btn-danger" onclick="deletarIngrediente(${i.id})" style="padding: 0.25rem 0.75rem;">🗑️</button>
-                        </td>
-                    </tr>
-                `;
-            });
-            document.getElementById('tabelaEstoque').innerHTML = estoqueHtml || '<tr><td colspan="6" style="text-align: center; color: #94a3b8;">Nenhum ingrediente cadastrado</td></tr>';
-
-            // DESPESAS
-            let despesasHtml = '';
-            dados.despesas.forEach(d => {
-                despesasHtml += `
-                    <tr>
-                        <td>${d.descricao}</td>
-                        <td><span class="badge badge-orange">${d.categoria}</span></td>
-                        <td>R$ ${d.valor.toFixed(2)}</td>
-                        <td>${d.data}</td>
-                        <td>
-                            <button class="btn btn-danger" onclick="deletarDespesa(${d.id})" style="padding: 0.25rem 0.75rem;">🗑️</button>
-                        </td>
-                    </tr>
-                `;
-            });
-            document.getElementById('tabelaDespesas').innerHTML = despesasHtml || '<tr><td colspan="5" style="text-align: center; color: #94a3b8;">Nenhuma despesa registrada</td></tr>';
-
-            // CLIENTES
-            let clientesHtml = '';
-            dados.clientes.forEach(c => {
-                const compras = dados.vendas.filter(v => v.cliente === c.nome).length;
-                const total = dados.vendas.filter(v => v.cliente === c.nome).reduce((sum, v) => sum + v.total, 0);
-                clientesHtml += `
-                    <tr>
-                        <td>${c.nome}</td>
-                        <td>${c.whatsapp || '-'}</td>
-                        <td>${compras}</td>
-                        <td>R$ ${total.toFixed(2)}</td>
-                        <td>
-                            <button class="btn btn-danger" onclick="deletarCliente(${c.id})" style="padding: 0.25rem 0.75rem;">🗑️</button>
-                        </td>
-                    </tr>
-                `;
-            });
-            document.getElementById('tabelaClientes').innerHTML = clientesHtml || '<tr><td colspan="5" style="text-align: center; color: #94a3b8;">Nenhum cliente cadastrado</td></tr>';
-
-            // COMBOS
-            let combosHtml = '';
-            dados.combos.forEach(c => {
-                combosHtml += `
-                    <tr>
-                        <td>${c.nome}</td>
-                        <td>-</td>
-                        <td>R$ ${c.preco.toFixed(2)}</td>
-                        <td>
-                            <button class="btn btn-danger" onclick="deletarCombo(${c.id})" style="padding: 0.25rem 0.75rem;">🗑️</button>
-                        </td>
-                    </tr>
-                `;
-            });
-            document.getElementById('tabelaCombos').innerHTML = combosHtml || '<tr><td colspan="4" style="text-align: center; color: #94a3b8;">Nenhum combo cadastrado</td></tr>';
-
-            // ADICIONAIS EM CONFIGURAÇÕES
-            let adicionaisHtml = '';
-            dados.adicionais.forEach(a => {
-                adicionaisHtml += `
-                    <div style="background: #0f172a; padding: 1rem; border-radius: 0.5rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-weight: bold;">${a.nome}</div>
-                            <div style="color: #94a3b8; font-size: 0.875rem;">R$ ${a.preco.toFixed(2)}</div>
-                        </div>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <button class="btn btn-primary" onclick="editarAdicional(${a.id})" style="padding: 0.25rem 0.75rem;">✏️</button>
-                            <button class="btn btn-danger" onclick="deletarAdicional(${a.id})" style="padding: 0.25rem 0.75rem;">🗑️</button>
-                        </div>
-                    </div>
-                `;
-            });
-            document.getElementById('listaAdicionais').innerHTML = adicionaisHtml;
-
-            // PRODUTOS NA TELA DE VENDAS
-            let produtosVendas = '';
-            dados.produtos.forEach(p => {
-                produtosVendas += `
-                    <div class="card product-card" onclick="adicionarAoCarrinho(${p.id})">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🍔</div>
-                        <div style="font-weight: bold; margin-bottom: 0.5rem;">${p.nome}</div>
-                        <div style="color: #f97316; font-weight: bold;">R$ ${p.preco.toFixed(2)}</div>
-                        <div style="color: #94a3b8; font-size: 0.875rem;">Lucro R$ ${(p.preco - p.custo).toFixed(2)}</div>
-                    </div>
-                `;
-            });
-            document.getElementById('gridProdutos').innerHTML = produtosVendas;
-
-            // COZINHA
-            const pendentes = dados.pedidos.filter(p => p.status === 'pendente');
-            document.getElementById('contadorPendentes').textContent = pendentes.length;
-
-            let cozinhaHtml = '';
-            pendentes.forEach(p => {
-                const tempo = new Date() - p.tempoInicio;
-                const minutos = Math.floor(tempo / 60000);
-                const segundos = Math.floor((tempo % 60000) / 1000);
-                const timerClass = minutos > 5 ? 'danger' : minutos > 3 ? 'warning' : '';
-
-                let itensHtml = '';
-                p.itens.forEach(item => {
-                    let adicionaisHtml = '';
-                    if (item.adicionais && item.adicionais.length > 0) {
-                        item.adicionais.forEach(adId => {
-                            const ad = dados.adicionais.find(a => a.id === adId);
-                            if (ad) adicionaisHtml += `<span class="additional-tag">${ad.nome}</span>`;
-                        });
-                    }
-                    itensHtml += `
-                        <div style="background: #0f172a; padding: 0.75rem; border-radius: 0.25rem; margin-bottom: 0.5rem;">
-                            <div style="font-weight: bold; margin-bottom: 0.25rem;">${item.nome}</div>
-                            <div style="color: #94a3b8; font-size: 0.875rem;">${adicionaisHtml}</div>
-                            ${item.observacoes ? `<div style="color: #94a3b8; font-size: 0.875rem; margin-top: 0.25rem;">📝 ${item.observacoes}</div>` : ''}
+        // ===== COZINHA =====
+        function renderCozinha() {
+            document.getElementById('cozinha-pedidos').innerHTML = app.vendas
+                .filter(v => v.status === 'pendente')
+                .map(v => {
+                    const tempo = Math.floor((Date.now() - new Date(v.data).getTime()) / 1000);
+                    const min = Math.floor(tempo / 60);
+                    const seg = tempo % 60;
+                    return `
+                        <div class="bg-gray-800 p-6 rounded-lg border-2 border-yellow-500">
+                            <div class="flex justify-between items-center mb-4">
+                                <p class="text-2xl font-bold text-orange-400">#${v.id}</p>
+                                <p class="text-2xl font-bold text-yellow-400">${min}:${seg.toString().padStart(2, '0')}</p>
+                            </div>
+                            <p class="font-bold mb-3">${v.cliente}</p>
+                            <div class="bg-gray-900 p-3 rounded mb-4 max-h-32 overflow-y-auto">
+                                ${v.itens.map(i => `<p class="text-sm">• ${i.qtd}x ${i.nome}</p>`).join('')}
+                            </div>
+                            <button onclick="marcarPronto(${v.id})" class="w-full bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-bold">✓ PRONTO</button>
                         </div>
                     `;
-                });
+                }).join('') || '<p class="text-gray-500 col-span-full">Nenhum pedido pendente</p>';
+        }
 
-                cozinhaHtml += `
-                    <div class="card product-card pending" style="border-left: 5px solid #f97316;">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                            <div>
-                                <div style="font-size: 1.5rem; font-weight: bold; color: #f97316;">#${p.numero}</div>
-                                <div style="color: #94a3b8; font-size: 0.875rem;">${p.cliente}</div>
-                            </div>
-                            <span class="badge badge-orange">${p.tipoPedido}</span>
-                        </div>
-                        <div class="timer ${timerClass}" style="margin-bottom: 1rem;">⏱️ ${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}</div>
-                        <div style="margin-bottom: 1rem;">
-                            ${itensHtml}
-                        </div>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <button class="btn btn-success" onclick="marcarPronto(${p.numero})" style="flex: 1;">✓ PRONTO</button>
-                            <button class="btn btn-danger" onclick="cancelarPedido(${p.numero})" style="flex: 1;">🗑️ Cancelar</button>
-                        </div>
-                    </div>
-                `;
+        function marcarPronto(id) {
+            const venda = app.vendas.find(v => v.id === id);
+            if (venda) {
+                venda.status = 'pronto';
+                salvarDados();
+                renderCozinha();
+            }
+        }
+
+        // ===== PRODUTOS =====
+        function renderProdutos() {
+            document.getElementById('tabela-produtos').innerHTML = `
+                <table class="w-full">
+                    <thead class="bg-gray-700">
+                        <tr>
+                            <th class="px-4 py-2 text-left">Nome</th>
+                            <th class="px-4 py-2 text-left">Preço</th>
+                            <th class="px-4 py-2 text-left">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${app.produtos.map(p => `
+                            <tr class="border-t border-gray-700">
+                                <td class="px-4 py-2">${p.nome}</td>
+                                <td class="px-4 py-2">R$ ${p.preco.toFixed(2)}</td>
+                                <td class="px-4 py-2">
+                                    <button onclick="excluirProduto(${p.id})" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm">Excluir</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function abrirModalProduto() {
+            document.getElementById('prod-nome').value = '';
+            document.getElementById('prod-preco').value = '';
+            document.getElementById('prod-imagem').value = '';
+            document.getElementById('modal-produto').classList.remove('hidden');
+        }
+
+        function fecharModalProduto() {
+            document.getElementById('modal-produto').classList.add('hidden');
+        }
+
+        function salvarProduto() {
+            const nome = document.getElementById('prod-nome').value;
+            const preco = parseFloat(document.getElementById('prod-preco').value) || 0;
+            const imagem = document.getElementById('prod-imagem').value || 'https://via.placeholder.com/200';
+
+            if (!nome || preco <= 0) {
+                alert('Preencha os campos corretamente!');
+                return;
+            }
+
+            app.produtos.push({
+                id: app.proximoId++,
+                nome,
+                preco,
+                imagem
             });
-            document.getElementById('gridCozinha').innerHTML = cozinhaHtml || '<p style="color: #94a3b8;">Nenhum pedido pendente</p>';
 
-            // HISTÓRICO DE VENDAS
-            let historicoVendasHtml = '';
-            dados.vendas.forEach(v => {
-                historicoVendasHtml += `
-                    <tr>
-                        <td>#${v.numero}</td>
-                        <td>${v.cliente}</td>
-                        <td>${v.itens.map(i => i.nome).join(', ')}</td>
-                        <td>R$ ${v.total.toFixed(2)}</td>
-                        <td>${v.metodo}</td>
-                        <td><span class="badge badge-green">Concluído</span></td>
-                        <td>${v.hora}</td>
-                    </tr>
-                `;
+            salvarDados();
+            fecharModalProduto();
+            renderProdutos();
+            renderVendas();
+        }
+
+        function excluirProduto(id) {
+            if (confirm('Tem certeza?')) {
+                app.produtos = app.produtos.filter(p => p.id !== id);
+                salvarDados();
+                renderProdutos();
+                renderVendas();
+            }
+        }
+
+        // ===== ESTOQUE =====
+        function renderEstoque() {
+            document.getElementById('tabela-estoque').innerHTML = `
+                <table class="w-full">
+                    <thead class="bg-gray-700">
+                        <tr>
+                            <th class="px-4 py-2 text-left">Nome</th>
+                            <th class="px-4 py-2 text-left">Estoque</th>
+                            <th class="px-4 py-2 text-left">Preço Unit.</th>
+                            <th class="px-4 py-2 text-left">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${app.ingredientes.map(i => `
+                            <tr class="border-t border-gray-700">
+                                <td class="px-4 py-2">${i.nome}</td>
+                                <td class="px-4 py-2">${i.estoque} ${i.unidade}</td>
+                                <td class="px-4 py-2">R$ ${i.preco.toFixed(2)}</td>
+                                <td class="px-4 py-2">
+                                    <button onclick="excluirIngrediente(${i.id})" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm">Excluir</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function abrirModalIngrediente() {
+            document.getElementById('ing-nome').value = '';
+            document.getElementById('ing-estoque').value = '';
+            document.getElementById('ing-preco').value = '';
+            document.getElementById('modal-ingrediente').classList.remove('hidden');
+        }
+
+        function fecharModalIngrediente() {
+            document.getElementById('modal-ingrediente').classList.add('hidden');
+        }
+
+        function salvarIngrediente() {
+            const nome = document.getElementById('ing-nome').value;
+            const estoque = parseFloat(document.getElementById('ing-estoque').value) || 0;
+            const unidade = document.getElementById('ing-unidade').value;
+            const preco = parseFloat(document.getElementById('ing-preco').value) || 0;
+
+            if (!nome || estoque < 0 || preco < 0) {
+                alert('Preencha os campos corretamente!');
+                return;
+            }
+
+            app.ingredientes.push({
+                id: app.proximoId++,
+                nome,
+                estoque,
+                unidade,
+                preco
             });
-            document.getElementById('tabelaHistoricoVendas').innerHTML = historicoVendasHtml || '<tr><td colspan="7" style="text-align: center; color: #94a3b8;">Nenhuma venda realizada</td></tr>';
 
-            // RELATÓRIOS
-            const totalFaturamento = dados.vendas.reduce((sum, v) => sum + v.total, 0);
-            const totalCusto = dados.vendas.reduce((sum, v) => {
-                return sum + v.itens.reduce((itemSum, item) => itemSum + item.custo, 0);
-            }, 0);
-            const lucroTotal = totalFaturamento - totalCusto;
-
-            document.getElementById('relFaturamento').textContent = `R$ ${totalFaturamento.toFixed(2)}`;
-            document.getElementById('relCMV').textContent = `R$ ${totalCusto.toFixed(2)}`;
-            document.getElementById('relLucroBruto').textContent = `R$ ${lucroTotal.toFixed(2)}`;
-
-            let relatorioHtml = '';
-            dados.vendas.forEach(v => {
-                const custoPedido = v.itens.reduce((sum, item) => sum + item.custo, 0);
-                const lucroPedido = v.total - custoPedido;
-                relatorioHtml += `
-                    <tr>
-                        <td>#${v.numero}</td>
-                        <td>${v.cliente}</td>
-                        <td>${v.itens.map(i => i.nome).join(', ')}</td>
-                        <td>R$ ${v.total.toFixed(2)}</td>
-                        <td>R$ ${custoPedido.toFixed(2)}</td>
-                        <td style="color: #22c55e;">R$ ${lucroPedido.toFixed(2)}</td>
-                        <td>${v.metodo}</td>
-                        <td>${v.data}</td>
-                    </tr>
-                `;
-            });
-            document.getElementById('tabelaRelatorios').innerHTML = relatorioHtml || '<tr><td colspan="8" style="text-align: center; color: #94a3b8;">Nenhuma venda</td></tr>';
-
-            // ATUALIZAR CRONÔMETRO
-            setInterval(() => {
-                const pendentes = dados.pedidos.filter(p => p.status === 'pendente');
-                pendentes.forEach((p, idx) => {
-                    const tempo = new Date() - p.tempoInicio;
-                    const minutos = Math.floor(tempo / 60000);
-                    const segundos = Math.floor((tempo % 60000) / 1000);
-                    const timers = document.querySelectorAll('.timer');
-                    if (timers[idx]) {
-                        timers[idx].textContent = `⏱️ ${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
-                        timers[idx].className = 'timer ' + (minutos > 5 ? 'danger' : minutos > 3 ? 'warning' : '');
-                    }
-                });
-            }, 1000);
-        }
-
-        // DELETAR FUNÇÕES
-        function deletarProduto(id) {
-            dados.produtos = dados.produtos.filter(p => p.id !== id);
             salvarDados();
+            fecharModalIngrediente();
+            renderEstoque();
         }
 
-        function deletarIngrediente(id) {
-            dados.ingredientes = dados.ingredientes.filter(i => i.id !== id);
-            salvarDados();
+        function excluirIngrediente(id) {
+            if (confirm('Tem certeza?')) {
+                app.ingredientes = app.ingredientes.filter(i => i.id !== id);
+                salvarDados();
+                renderEstoque();
+            }
         }
 
-        function deletarDespesa(id) {
-            dados.despesas = dados.despesas.filter(d => d.id !== id);
-            salvarDados();
+        // ===== RELATÓRIOS =====
+        function renderRelatorios() {
+            const faturamento = app.vendas.reduce((sum, v) => sum + v.total, 0);
+            const despesas = app.vendas.reduce((sum, v) => sum + (v.taxa || 0), 0);
+            const lucro = faturamento - despesas;
+            const margem = faturamento > 0 ? ((lucro / faturamento) * 100).toFixed(1) : 0;
+
+            document.getElementById('rel-faturamento').textContent = `R$ ${faturamento.toFixed(2)}`;
+            document.getElementById('rel-despesas').textContent = `R$ ${despesas.toFixed(2)}`;
+            document.getElementById('rel-lucro').textContent = `R$ ${lucro.toFixed(2)}`;
+            document.getElementById('rel-margem').textContent = `${margem}%`;
         }
 
-        function deletarCliente(id) {
-            dados.clientes = dados.clientes.filter(c => c.id !== id);
-            salvarDados();
-        }
-
-        function deletarCombo(id) {
-            dados.combos = dados.combos.filter(c => c.id !== id);
-            salvarDados();
-        }
-
-        // EXPORTAR PDF
         function exportarPDF() {
-            const element = document.getElementById('tabelaRelatorios');
-            const opt = {
-                margin: 10,
-                filename: 'relatorio-food-truck.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
-            };
-            html2pdf().set(opt).from(element).save();
-        }
+            const doc = new jsPDF();
+            doc.setFontSize(16);
+            doc.text('Relatório Food Truck Manager', 10, 10);
+            doc.setFontSize(10);
+            doc.text(`Data: ${new Date().toLocaleDateString()}`, 10, 20);
 
-        // EXPORTAR EXCEL
-        function exportarExcel() {
-            let csv = 'Número,Cliente,Produtos,Total,Custo,Lucro,Método,Data\n';
-            dados.vendas.forEach(v => {
-                const custoPedido = v.itens.reduce((sum, item) => sum + item.custo, 0);
-                const lucroPedido = v.total - custoPedido;
-                csv += `#${v.numero},"${v.cliente}","${v.itens.map(i => i.nome).join(', ')}",${v.total.toFixed(2)},${custoPedido.toFixed(2)},${lucroPedido.toFixed(2)},"${v.metodo}",${v.data}\n`;
+            const dados = app.vendas.map(v => [
+                `#${v.id}`,
+                v.cliente,
+                `R$ ${v.total.toFixed(2)}`,
+                v.metodo,
+                v.status
+            ]);
+
+            doc.autoTable({
+                head: [['Pedido', 'Cliente', 'Valor', 'Pagamento', 'Status']],
+                body: dados,
+                startY: 30
             });
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'relatorio-food-truck.csv';
-            a.click();
+
+            doc.save('relatorio_food_truck.pdf');
         }
 
-        // INICIALIZAR
+        // ===== CONFIG =====
+        function salvarConfig() {
+            app.config.taxaDebito = parseFloat(document.getElementById('taxa-debito').value) || 0;
+            app.config.taxaCredito = parseFloat(document.getElementById('taxa-credito').value) || 0;
+            salvarDados();
+            alert('Configurações salvas!');
+        }
+
+        function limparTudo() {
+            if (confirm('⚠️ Tem certeza? Isso vai deletar TUDO!')) {
+                if (confirm('Tem CERTEZA MESMO?')) {
+                    localStorage.removeItem('foodTruck');
+                    location.reload();
+                }
+            }
+        }
+
+        // Inicializar
         carregarDados();
+        irPara('dashboard');
     </script>
 </body>
 </html>
